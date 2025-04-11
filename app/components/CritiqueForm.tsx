@@ -24,7 +24,7 @@ const CritiqueForm = () => {
       return;
     }
     if (!url) {
-      setError("Please Enter a valid url");
+      setError("Please Enter a valid url.");
       return;
     }
     try {
