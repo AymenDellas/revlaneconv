@@ -66,7 +66,7 @@ const CritiqueForm = () => {
     }
   };
   return (
-    <section className="bg-white border border-black/10  0  p-8 w-[50%] my-20 rounded-lg shadow-lg space-y-8">
+    <section className="bg-white border border-black/10  0  p-8 w-[90%] lg:w-[75%] xl:w-[50%]  my-20 rounded-lg shadow-lg space-y-8">
       <div className="flex flex-col space-y-4">
         <h2 className="text-2xl font-bold">Analyze by URL</h2>
         <p className="text-gray-700">
