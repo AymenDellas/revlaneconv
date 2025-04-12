@@ -32,7 +32,7 @@ export const metadata = {
     siteName: "AI Roaster",
     images: [
       {
-        url: "https://yourtoolurl.com/favicon.ico",
+        url: "https://airoaster.vercel.app/favicon.ico",
         width: 1200,
         height: 630,
         alt: "AI UI/UX Roaster",
