@@ -28,11 +28,11 @@ export const metadata = {
     title: "AI UI/UX Roaster",
     description:
       "Let AI roast your website's UI/UX. Paste a URL, and get honest feedback instantly.",
-    url: "https://yourtoolurl.com",
+    url: "https://airoaster.vercel.app/",
     siteName: "AI Roaster",
     images: [
       {
-        url: "https://yourtoolurl.com/og-image.png",
+        url: "https://yourtoolurl.com/favicon.ico",
         width: 1200,
         height: 630,
         alt: "AI UI/UX Roaster",
