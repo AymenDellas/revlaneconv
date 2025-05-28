@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config, { isServer }) => {
-    // For server-side bundles, ignore .map files from chrome-aws-lambda
+    // For server-side bundles, ignore .map files from @sparticuz/chromium
     if (isServer) {
       config.module.rules.push({
         test: /\.map$/,
-        include: /node_modules\/chrome-aws-lambda/,
+        include: /node_modules\/@sparticuz\/chromium/,
         use: 'null-loader',
       });
     }

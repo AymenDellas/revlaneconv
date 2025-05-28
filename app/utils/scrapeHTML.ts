@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chrome-aws-lambda';
+import chromium from '@sparticuz/chromium';
 import { validateAndNormalizeUrl } from "@/app/lib/urlUtils";
 
 /**
@@ -16,11 +16,11 @@ export async function scrapeHTML(url: string): Promise<string> {
 
   console.log(`[Scraper] Starting to fetch content from: ${validUrl}`);
   
-  // Launch a headless browser using chrome-aws-lambda
+  // Launch a headless browser using @sparticuz/chromium
   const browser = await puppeteer.launch({
     args: chromium.args,
-    executablePath: await chromium.executablePath || process.env.CHROME_EXECUTABLE_PATH,
-    headless: chromium.headless // or true if using chrome-aws-lambda v10+
+    executablePath: (await chromium.executablePath()) || process.env.CHROME_EXECUTABLE_PATH,
+    headless: chromium.headless // headless: true is generally recommended for serverless
   });
   
   try {
