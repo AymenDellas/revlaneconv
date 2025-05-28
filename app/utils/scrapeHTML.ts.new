@@ -231,15 +231,14 @@ async function extractColorInfo(page: any): Promise<string> {
  */
 async function analyzePageStructure(page: any, url: string): Promise<string> {
   try {
-    console.log(`[Scraper] Analyzing page structure for: ${url}`);
     const analysis = await page.evaluate((pageUrl: string) => {
       // Create a structured analysis of the page
-      const analysisResults = {
+      const analysis = {
         url: pageUrl,
         title: document.title,
         description: document.querySelector('meta[name="description"]')?.getAttribute('content') || '',
         hasTestimonials: false,
-        testimonialDetails: [] as Array<{selector: string, text: string, position: string, reason: string}>,
+        testimonialDetails: [] as Array<{selector: string, text: string, position: string}>,
         hasTrustBadges: false,
         trustBadgeDetails: [] as string[],
         hasSocialProof: false,
@@ -249,31 +248,24 @@ async function analyzePageStructure(page: any, url: string): Promise<string> {
         navigationItems: [] as string[],
         pageStructure: [] as Array<{level: string, text: string}>
       };
-
-      console.log('[Scraper - PageContext] Starting testimonial detection...');
-
+      
       // Detect testimonials using multiple methods
       const testimonialSelectors = [
         '.testimonial', '.testimonials', '.review', '.reviews', '.feedback',
         '[class*="testimonial"]', '[class*="review"]', '[id*="testimonial"]',
-        '[id*="review"]', '.quote', '.quotes', 'blockquote', '[data-testimonial]',
-        'section[aria-label*="testimonial"], div[aria-label*="testimonial"]'
+        '[id*="review"]', '.quote', '.quotes', 'blockquote'
       ];
       
-      console.log('[Scraper - PageContext] Checking selectors for testimonials:', testimonialSelectors);
+      // Check for testimonials by selector
       testimonialSelectors.forEach(selector => {
         const elements = document.querySelectorAll(selector);
-        console.log(`[Scraper - PageContext] Selector: '${selector}', Found elements: ${elements.length}`);
         if (elements.length > 0) {
-          analysisResults.hasTestimonials = true;
+          analysis.hasTestimonials = true;
           elements.forEach((el, index) => {
-            const textContent = el.textContent?.trim().substring(0, 150) + '...' || '';
-            console.log(`[Scraper - PageContext]   - Element ${index + 1} text: ${textContent}`);
-            analysisResults.testimonialDetails.push({
+            analysis.testimonialDetails.push({
               selector,
-              text: textContent,
-              position: `selector match ${index + 1}`,
-              reason: `Matched selector: ${selector}`
+              text: el.textContent?.substring(0, 100) + '...' || '',
+              position: `selector match ${index + 1}`
             });
           });
         }
@@ -283,36 +275,22 @@ async function analyzePageStructure(page: any, url: string): Promise<string> {
       const testimonialKeywords = [
         'testimonial', 'review', 'what our clients say', 'what customers say',
         'customer feedback', 'client feedback', 'success story', 'case study',
-        'happy customer', 'satisfied client', 'client stories', 'user review'
+        'happy customer', 'satisfied client'
       ];
-      console.log('[Scraper - PageContext] Checking keywords for testimonials:', testimonialKeywords);
       
-      document.querySelectorAll('div, section, article, blockquote, p, li').forEach((el, index) => {
-        const text = el.textContent?.toLowerCase().trim() || '';
-        if (text.length > 50 && text.length < 1000) { // Only consider elements with a reasonable amount of text
-            testimonialKeywords.forEach(keyword => {
-                if (text.includes(keyword)) {
-                    analysisResults.hasTestimonials = true;
-                    const existingEntry = analysisResults.testimonialDetails.find(entry => entry.text.startsWith(text.substring(0, 50)));
-                    if (!existingEntry) {
-                        const elementPath = el.tagName.toLowerCase() + 
-                            (el.id ? `#${el.id}` : '') + 
-                            (el.className && typeof el.className === 'string' ? `.${el.className.replace(/\s+/g, '.')}` : '');
-                        const shortText = text.substring(0, 150) + '...';
-                        console.log(`[Scraper - PageContext] Keyword '${keyword}' found in element: ${elementPath}, Text: ${shortText}`);
-                        analysisResults.testimonialDetails.push({
-                            selector: elementPath,
-                            text: shortText,
-                            position: `keyword match ${index + 1}`,
-                            reason: `Matched keyword: ${keyword}`
-                        });
-                    }
-                }
-            });
+      document.querySelectorAll('div, section, article, blockquote').forEach((el, index) => {
+        const text = el.textContent?.toLowerCase() || '';
+        if (testimonialKeywords.some(keyword => text.includes(keyword))) {
+          analysis.hasTestimonials = true;
+          analysis.testimonialDetails.push({
+            selector: el.tagName.toLowerCase() + 
+              (el.id ? `#${el.id}` : '') + 
+              (el.className ? `.${el.className.replace(/\s+/g, '.')}` : ''),
+            text: text.substring(0, 100) + '...',
+            position: `text-based detection ${index + 1}`
+          });
         }
       });
-
-      console.log('[Scraper - PageContext] Testimonial detection complete. Found:', analysisResults.testimonialDetails.length);
       
       // Check for trust badges
       const trustBadgeSelectors = [
@@ -326,11 +304,11 @@ async function analyzePageStructure(page: any, url: string): Promise<string> {
       trustBadgeSelectors.forEach(selector => {
         const elements = document.querySelectorAll(selector);
         if (elements.length > 0) {
-          analysisResults.hasTrustBadges = true;
+          analysis.hasTrustBadges = true;
           elements.forEach(el => {
             const alt = el.getAttribute('alt') || '';
             const src = el.getAttribute('src') || '';
-            analysisResults.trustBadgeDetails.push(`${selector}: ${alt || src}`);
+            analysis.trustBadgeDetails.push(`${selector}: ${alt || src}`);
           });
         }
       });
@@ -338,12 +316,12 @@ async function analyzePageStructure(page: any, url: string): Promise<string> {
       // Check for contact forms
       const forms = document.querySelectorAll('form');
       if (forms.length > 0) {
-        analysisResults.hasContactForm = true;
+        analysis.hasContactForm = true;
         forms.forEach(form => {
           const inputs = form.querySelectorAll('input, textarea, select');
           inputs.forEach(input => {
             const type = input.getAttribute('type') || input.tagName.toLowerCase();
-            analysisResults.formFields.push({
+            analysis.formFields.push({
               type,
               name: input.getAttribute('name') || input.getAttribute('id') || '',
               placeholder: input.getAttribute('placeholder') || ''
@@ -362,7 +340,7 @@ async function analyzePageStructure(page: any, url: string): Promise<string> {
         const elements = document.querySelectorAll(selector);
         elements.forEach((el, index) => {
           const href = el.getAttribute('href') || '';
-          analysisResults.ctaButtons.push({
+          analysis.ctaButtons.push({
             text: el.textContent?.trim() || '',
             href,
             position: `${selector} ${index + 1}`
@@ -373,25 +351,24 @@ async function analyzePageStructure(page: any, url: string): Promise<string> {
       // Extract navigation items
       const navItems = document.querySelectorAll('nav a, header a, .menu a, .navigation a');
       navItems.forEach(item => {
-        analysisResults.navigationItems.push(item.textContent?.trim() || '');
+        analysis.navigationItems.push(item.textContent?.trim() || '');
       });
       
       // Extract page structure (headings)
       const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
       headings.forEach(heading => {
-        analysisResults.pageStructure.push({
+        analysis.pageStructure.push({
           level: heading.tagName.toLowerCase(),
           text: heading.textContent?.trim() || ''
         });
       });
       
-      return JSON.stringify(analysisResults, null, 2);
+      return JSON.stringify(analysis, null, 2);
     }, url);
     
-    console.log(`[Scraper] Page structure analysis result for ${url}:\n${analysis}`);
     return analysis;
   } catch (error) {
-    console.warn(`[Scraper] Error analyzing page structure for ${url}: ${error}`);
+    console.warn(`[Scraper] Error analyzing page structure: ${error}`);
     return JSON.stringify({ url, error: 'Failed to analyze page structure' });
   }
 }
