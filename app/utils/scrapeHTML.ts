@@ -1,4 +1,5 @@
-import puppeteer from 'puppeteer';
+import puppeteer from 'puppeteer-core';
+import chromium from 'chrome-aws-lambda';
 import { validateAndNormalizeUrl } from "@/app/lib/urlUtils";
 
 /**
@@ -15,10 +16,11 @@ export async function scrapeHTML(url: string): Promise<string> {
 
   console.log(`[Scraper] Starting to fetch content from: ${validUrl}`);
   
-  // Launch a headless browser
-  const browser = await puppeteer.launch({ 
-    headless: true,
-    args: ['--no-sandbox', '--disable-setuid-sandbox']
+  // Launch a headless browser using chrome-aws-lambda
+  const browser = await puppeteer.launch({
+    args: chromium.args,
+    executablePath: await chromium.executablePath || process.env.CHROME_EXECUTABLE_PATH,
+    headless: chromium.headless // or true if using chrome-aws-lambda v10+
   });
   
   try {
