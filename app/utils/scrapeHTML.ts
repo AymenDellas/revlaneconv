@@ -1,5 +1,5 @@
 import puppeteer from 'puppeteer-core';
-import chromium from 'chrome-aws-lambda';
+import chromium from '@sparticuz/chrome-aws-lambda';
 import { validateAndNormalizeUrl } from "@/app/lib/urlUtils";
 
 /**
