@@ -37,8 +37,8 @@ export async function scrapeHTML(url: string): Promise<string> {
       console.log(`[Scraper] Production environment: Using @sparticuz/chromium. NODE_ENV: ${process.env.NODE_ENV}`);
       executablePath = await chromium.executablePath();
       console.log(`[Scraper] Chromium executable path: ${executablePath}`);
-      launchArgs = chromium.args; // Ensure launchArgs are set for production from chromium.args
-      console.log(`[Scraper] Chromium args: ${JSON.stringify(launchArgs)}`);
+      launchArgs = chromium.args.filter(arg => !arg.startsWith('--headless')); // Remove any existing headless arg
+      console.log(`[Scraper] Chromium args (after filtering headless): ${JSON.stringify(launchArgs)}`);
     }
 
     browser = await puppeteer.launch({
@@ -46,7 +46,7 @@ export async function scrapeHTML(url: string): Promise<string> {
       defaultViewport: chromium.defaultViewport, // Can still use sparticuz default viewport
       executablePath: executablePath, // Will be from sparticuz in prod, or auto-detected/undefined locally
       headless: (process.env.NODE_ENV === 'production' 
-            ? chromium.headless 
+            ? "new" // Explicitly use 'new' for production headless
             : "new") as PuppeteerLaunchOptions['headless'],
       ignoreHTTPSErrors: true,
     });
