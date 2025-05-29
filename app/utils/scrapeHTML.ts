@@ -1,4 +1,5 @@
-import puppeteer from 'puppeteer';
+import puppeteer, { type PuppeteerLaunchOptions } from 'puppeteer-core';
+import chromium from '@sparticuz/chromium';
 import { validateAndNormalizeUrl } from "@/app/lib/urlUtils";
 
 /**
@@ -16,9 +17,35 @@ export async function scrapeHTML(url: string): Promise<string> {
   
   let browser;
   try {
+    let executablePath: string | undefined = undefined;
+    let launchArgs = chromium.args; // Start with sparticuz args as a base
+
+    if (process.env.NODE_ENV !== 'production') {
+      console.log("[Scraper] Local development: Using specified executablePath for Chromium.");
+      // For local, we might not need all sparticuz args, especially those related to /tmp
+      launchArgs = [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-accelerated-2d-canvas',
+        '--no-first-run',
+        '--no-zygote',
+        '--disable-gpu'
+      ];
+      executablePath = 'C:\\Users\\della\\.cache\\puppeteer\\chrome\\win64-127.0.6533.88\\chrome-win64\\chrome.exe';
+    } else {
+      console.log("[Scraper] Production environment: Using @sparticuz/chromium.");
+      executablePath = await chromium.executablePath();
+    }
+
     browser = await puppeteer.launch({
-      headless: true, // Use the new headless mode
-      args: ['--no-sandbox', '--disable-setuid-sandbox'] // Common args for compatibility
+      args: launchArgs,
+      defaultViewport: chromium.defaultViewport, // Can still use sparticuz default viewport
+      executablePath: executablePath, // Will be from sparticuz in prod, or auto-detected/undefined locally
+      headless: (process.env.NODE_ENV === 'production' 
+            ? chromium.headless 
+            : "new") as PuppeteerLaunchOptions['headless'],
+      ignoreHTTPSErrors: true,
     });
     const page = await browser.newPage();
     

@@ -26,7 +26,8 @@
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-spinners": "^0.15.0",
-    "puppeteer": "^22.10.0"
+    "puppeteer-core": "^22.10.0",
+    "@sparticuz/chromium": "^123.0.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.3",
