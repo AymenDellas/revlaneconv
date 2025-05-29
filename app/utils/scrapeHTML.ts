@@ -34,8 +34,11 @@ export async function scrapeHTML(url: string): Promise<string> {
       ];
       executablePath = 'C:\\Users\\della\\.cache\\puppeteer\\chrome\\win64-127.0.6533.88\\chrome-win64\\chrome.exe';
     } else {
-      console.log("[Scraper] Production environment: Using @sparticuz/chromium.");
+      console.log(`[Scraper] Production environment: Using @sparticuz/chromium. NODE_ENV: ${process.env.NODE_ENV}`);
       executablePath = await chromium.executablePath();
+      console.log(`[Scraper] Chromium executable path: ${executablePath}`);
+      launchArgs = chromium.args; // Ensure launchArgs are set for production from chromium.args
+      console.log(`[Scraper] Chromium args: ${JSON.stringify(launchArgs)}`);
     }
 
     browser = await puppeteer.launch({
