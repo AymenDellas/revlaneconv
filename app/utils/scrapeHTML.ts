@@ -1,9 +1,8 @@
-import puppeteer, { type PuppeteerLaunchOptions } from 'puppeteer-core';
-import chromium from '@sparticuz/chromium';
+import axios from 'axios';
 import { validateAndNormalizeUrl } from "@/app/lib/urlUtils";
 
 /**
- * Scrapes HTML content from a given URL using Puppeteer
+ * Scrapes HTML content from a given URL using axios
  * @param url The URL to scrape
  * @returns Promise with the HTML content
  */
@@ -13,71 +12,38 @@ export async function scrapeHTML(url: string): Promise<string> {
     throw new Error("Invalid URL format - please check the URL");
   }
 
-  console.log(`[Scraper] Starting to fetch content from: ${validUrl} using Puppeteer`);
-  
-  let browser;
+  console.log(`[Scraper] Starting to fetch content from: ${validUrl} using axios`);
+
   try {
-    let executablePath: string | undefined = undefined;
-    let launchArgs = chromium.args; // Start with sparticuz args as a base
-
-    if (process.env.NODE_ENV !== 'production') {
-      console.log("[Scraper] Local development: Using specified executablePath for Chromium.");
-      // For local, we might not need all sparticuz args, especially those related to /tmp
-      launchArgs = [
-        '--no-sandbox',
-        '--disable-setuid-sandbox',
-        '--disable-dev-shm-usage',
-        '--disable-accelerated-2d-canvas',
-        '--no-first-run',
-        '--no-zygote',
-        '--disable-gpu'
-      ];
-      executablePath = 'C:\\Users\\della\\.cache\\puppeteer\\chrome\\win64-127.0.6533.88\\chrome-win64\\chrome.exe';
-    } else {
-      console.log(`[Scraper] Production environment: Using @sparticuz/chromium. NODE_ENV: ${process.env.NODE_ENV}`);
-      executablePath = await chromium.executablePath();
-      console.log(`[Scraper] Chromium executable path: ${executablePath}`);
-      launchArgs = chromium.args.filter(arg => !arg.startsWith('--headless')); // Remove any existing headless arg
-      console.log(`[Scraper] Chromium args (after filtering headless): ${JSON.stringify(launchArgs)}`);
-    }
-
-    browser = await puppeteer.launch({
-      args: launchArgs,
-      defaultViewport: chromium.defaultViewport, // Can still use sparticuz default viewport
-      executablePath: executablePath, // Will be from sparticuz in prod, or auto-detected/undefined locally
-      headless: (process.env.NODE_ENV === 'production' 
-            ? "new" // Explicitly use 'new' for production headless
-            : "new") as PuppeteerLaunchOptions['headless'],
-      ignoreHTTPSErrors: true,
-    });
-    const page = await browser.newPage();
-    
-    // Set a user agent
-    await page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36');
-    
-    // Navigate to the page
-    await page.goto(validUrl, {
-      waitUntil: 'networkidle2', // Wait until network activity has calmed down
-      timeout: 45000 // 45 seconds timeout, Puppeteer can be slower
+    const response = await axios.get(validUrl, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8',
+        'Accept-Language': 'en-US,en;q=0.9',
+      },
+      timeout: 15000, // 15 seconds timeout
     });
 
-    const htmlContent = await page.content();
+    const htmlContent = response.data;
 
     if (!htmlContent || typeof htmlContent !== 'string' || htmlContent.trim().length < 100) {
       const contentLength = htmlContent ? String(htmlContent).length : 0;
       const snippet = htmlContent ? String(htmlContent).substring(0, 200) : "";
-      console.warn(`[Scraper] Potentially insufficient content from ${validUrl} using Puppeteer. Length: ${contentLength}. Snippet: \"${snippet}\"`);
+      console.warn(`[Scraper] Potentially insufficient content from ${validUrl} using axios. Length: ${contentLength}. Snippet: \"${snippet}\"`);
     }
     
     return htmlContent;
 
   } catch (error: any) {
-    console.error(`[Scraper] Error scraping ${validUrl} with Puppeteer:`, error.message);
-    throw new Error(`Failed to scrape HTML content from ${validUrl} using Puppeteer. Details: ${error.message}`);
-  } finally {
-    if (browser) {
-      await browser.close();
+    if (axios.isAxiosError(error)) {
+      console.error(`[Scraper] Axios error scraping ${validUrl}: ${error.message}`);
+      if (error.response) {
+        console.error(`[Scraper] Status: ${error.response.status}, Data: ${JSON.stringify(error.response.data).substring(0, 200)}`);
+      }
+      throw new Error(`Failed to scrape HTML content from ${validUrl} using axios. Status: ${error.response?.status}, Message: ${error.message}`);
+    } else {
+      console.error(`[Scraper] Generic error scraping ${validUrl} with axios:`, error.message);
+      throw new Error(`Failed to scrape HTML content from ${validUrl} using axios. Details: ${error.message}`);
     }
   }
 }
-
