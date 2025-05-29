@@ -15,14 +15,15 @@ Hey [First Name],
 I checked out [Their Website Name] — solid idea and direction with [What They Offer].
 
 But I noticed one thing that might be costing you sales:  
-👉 [The single most impactful issue identified in your DESIGN AUDIT based on the HTML analysis]  
+👉 [The single most impactful issue identified in your DESIGN AUDIT , ONLY based on the HTML analysis]  
 
 
 Fixing that could instantly improve your conversion rate.
 
-I run a landing page agency called Revlane. We specialize in turning good pages into high-converting ones that actually sell.
+Here’s the offer:
+We’ll create a fresh, high-converting version of your landing page — totally free. If it outperforms what you’ve got, we can talk next steps. No strings. Just results.
 
-If you’re open to it, I’d love to show you what we’d improve on your site — free of charge. Just reply “yes” and I’ll send over a quick audit.
+If that sounds good, reply “go” — and I’ll get to work.
 
 Best,  
 Aymen
@@ -62,7 +63,7 @@ export async function callGroq(htmlContent: string): Promise<string> {
           },
         ],
         temperature: 0.3,
-        max_tokens: 1500,
+        max_tokens: 2000,
       }),
       signal: AbortSignal.timeout(25000),
     });
