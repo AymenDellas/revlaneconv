@@ -5,7 +5,7 @@ As Revlane’s AI Conversion Strategist, your job is to audit scraped landing pa
 You are Revlane’s AI Conversion Strategist. Analyze the website data provided and output:
 
 1. BUSINESS INSIGHTS — tone, hooks, audience pain points, conversion triggers (present + missing).  
-2. DESIGN AUDIT — scores (1-10) for: headline clarity, CTA strength, trust signal visibility, form friction. Call out 3 issues, add CSS/HEX if available. Crucially, identify the *single most impactful* of these issues based *directly on your analysis of the provided HTML data*. This specific issue will be used in the email.  
+2. DESIGN AUDIT — scores (1-10) for: headline clarity, CTA strength, trust signal visibility, form friction. Call out 3 specific issues. **These issues must be *directly observable* in the provided HTML data and represent *real, tangible problems* a user would encounter.** Avoid generic advice; focus on concrete problems. Add CSS/HEX if available for visual issues. Crucially, identify the *single most impactful* of these tangible issues based *strictly on your analysis of the provided HTML data*. This specific, observable issue will be used in the email.  
 3. PERSONALIZED EMAIL FRAMEWORK — the cold email must always follow this format exactly:
 
 Subject: Quick tip to boost conversions on [Their Website Name]
@@ -16,10 +16,7 @@ I checked out [Their Website Name] — solid idea and direction with [What They 
 
 But I noticed one thing that might be costing you sales:  
 👉 [The single most impactful issue identified in your DESIGN AUDIT based on the HTML analysis]  
-(For context, examples of *types* of issues we look for include:  
-– The hero section doesn’t clearly state the problem solved.  
-– The CTA is not prominent on mobile devices.  
-– Key trust elements like testimonials are missing or not visible.)
+
 
 Fixing that could instantly improve your conversion rate.
 
@@ -71,15 +68,38 @@ export async function callGroq(htmlContent: string): Promise<string> {
     });
 
     if (!res.ok) {
-      // More detailed error handling
+      const errorText = await res.text(); // Get response as text to see what it is
+      console.error(`[Groq API Error] Status: ${res.status} ${res.statusText}`);
+      console.error(`[Groq API Error] Response Body (first 500 chars): ${errorText.substring(0, 500)}...`);
+
       if (res.status === 401) {
-        console.error("Invalid API key - please check your configuration");
+        console.error("Invalid API key - please check your .env file or environment variables.");
+        // Provide a more specific error message for 401
+        throw new Error("Analysis failed (401): Unauthorized. Please check your Groq API key.");
       }
-      const errorData = await res.json().catch(() => ({}));
+
+      // Try to parse as JSON for structured error, but fallback if it's not JSON
+      let errorDataMessage = "Unknown error";
+      try {
+        const errorData = JSON.parse(errorText); // Try parsing the logged text
+        errorDataMessage = errorData.error?.message || errorText.substring(0, 200); // Use parsed message or snippet
+      } catch (e) {
+        // If parsing fails, use a snippet of the raw error text
+        errorDataMessage = errorText.substring(0, 200) + (errorText.length > 200 ? "..." : "");
+      }
       throw new Error(
-        `Analysis failed (${res.status}): ${
-          errorData.error?.message || "Unknown error"
-        }`
+        `Analysis failed (${res.status}): ${errorDataMessage}`
+      );
+    }
+
+    // If res.ok, but content type is not JSON, it's also an issue
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const responseText = await res.text();
+      console.error(`[Groq API Error] Expected JSON response, but got Content-Type: ${contentType}`);
+      console.error(`[Groq API Error] Response Body (first 500 chars): ${responseText.substring(0, 500)}...`);
+      throw new Error(
+        `Analysis failed: Expected JSON response from Groq API, but received ${contentType}. Response snippet: ${responseText.substring(0,200)}` + (responseText.length > 200 ? "..." : "")
       );
     }
 
