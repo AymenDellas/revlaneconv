@@ -16,7 +16,8 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
     SPECIFIC_ISSUES_HEADER: "Call out 3 specific issues.", // And suggestions
     PERFORMANCE_OVERVIEW: "PERFORMANCE OVERVIEW:",
     EMAIL_FRAMEWORK: "PERSONALIZED EMAIL FRAMEWORK", // Original prompt name
-    EMAIL_GENERATOR: "COLD EMAIL GENERATOR" // What the component currently uses
+    // EMAIL_GENERATOR: "COLD EMAIL GENERATOR" // What the component currently uses - EMAIL_FRAMEWORK is more accurate from prompt
+    AB_TESTING_SUGGESTIONS: "A/B TESTING SUGGESTIONS FOR EMAIL OUTREACH:"
   };
 
   // Function to extract a section based on a header and potential next headers
@@ -42,14 +43,28 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
   const mobileReadinessContent = extractSection(designAuditContent, HEADERS.MOBILE_READINESS, []); // It's within Design Audit
   // For "3 specific issues and suggestions", this will be more complex and might need to be handled inside the Design Audit rendering
 
-  const performanceOverviewContent = extractSection(fullText, HEADERS.PERFORMANCE_OVERVIEW, [HEADERS.EMAIL_FRAMEWORK]);
-  const emailContent = extractSection(fullText, HEADERS.EMAIL_FRAMEWORK, []);
+  const performanceOverviewContent = extractSection(fullText, HEADERS.PERFORMANCE_OVERVIEW, [HEADERS.EMAIL_FRAMEWORK, HEADERS.AB_TESTING_SUGGESTIONS]); // A/B might follow performance if email is short
+
+  // Email section might contain A/B suggestions as a sub-section
+  const rawEmailBlockContent = extractSection(fullText, HEADERS.EMAIL_FRAMEWORK, []); // Get the whole block first
+
+  let mainEmailContent = rawEmailBlockContent;
+  let abTestingSuggestionsContent = "";
+
+  if (rawEmailBlockContent.includes(HEADERS.AB_TESTING_SUGGESTIONS)) {
+    const parts = rawEmailBlockContent.split(new RegExp(HEADERS.AB_TESTING_SUGGESTIONS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
+    mainEmailContent = parts[0].trim();
+    if (parts.length > 1) {
+      abTestingSuggestionsContent = parts[1].trim();
+    }
+  }
 
 
   // Function to copy email content to clipboard
   const copyEmailToClipboard = () => {
-    if (emailContent) {
-      const plainText = emailContent.replace(/<[^>]*>/g, '').replace(/Subject:.*?\n\n/i, '').replace(/Hey \[First Name\],\n\n/i, ''); // More refined cleaning
+    // Copy only the main email content, not A/B suggestions
+    if (mainEmailContent) {
+      const plainText = mainEmailContent.replace(/<[^>]*>/g, '').replace(/Subject:.*?\n\n/i, '').replace(/Hey \[First Name\],\n\n/i, '');
       navigator.clipboard.writeText(plainText.trim()).then(() => {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
@@ -115,8 +130,10 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
   
   // Enhanced function to parse and render "3 specific issues" with suggestions
   const renderDesignIssues = (designAuditText: string) => {
-    // Attempt to find the part of the text that lists the 3 issues.
-    // This is a heuristic. It assumes issues start after "Call out 3 specific issues."
+    // This function might need significant rework if the "TOP 3 CONVERSION KILLERS" prompt section is used,
+    // as its structure is very different from "Call out 3 specific issues."
+    // For now, it retains its original logic.
+    const issuesHeaderText = HEADERS.SPECIFIC_ISSUES_HEADER; // This header is from the OLD prompt structure.
     // and are typically list items or numbered.
     const issuesHeaderText = HEADERS.SPECIFIC_ISSUES_HEADER;
     const issuesStartIndex = designAuditText.toLowerCase().indexOf(issuesHeaderText.toLowerCase());
@@ -154,8 +171,95 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
     );
   };
 
+  const parseAndRenderABSuggestions = (abText: string) => {
+    if (!abText.trim()) return null;
 
-  const hasContent = businessInsightsContent || designAuditContent || performanceOverviewContent || emailContent;
+    const sections = [];
+
+    // Helper to parse each A/B test category (Subject, Hook, CTA)
+    const parseCategory = (keyPhrase: string, title: string, fullAbText: string) => {
+      // Find the starting point of the category based on the key phrase
+      const keyPhraseIndex = fullAbText.toLowerCase().indexOf(keyPhrase.toLowerCase());
+      if (keyPhraseIndex === -1) return null;
+
+      // Extract text from the start of the key phrase
+      let relevantText = fullAbText.substring(keyPhraseIndex);
+
+      // Remove the key phrase itself to get to the content
+      relevantText = relevantText.substring(keyPhrase.length);
+
+      // Determine the end point (start of next A/B category or end of string)
+      const nextCategoryKeywords = ["Subject Line Variants", "Opening Hook Variants", "Call to Action (CTA) Phrase Variants"];
+      let endPoint = relevantText.length;
+
+      nextCategoryKeywords.forEach(nextKeyword => {
+        if (nextKeyword.toLowerCase() !== keyPhrase.toLowerCase()) { // Don't use the current keyphrase to delimit itself
+          const nextKeywordIndex = relevantText.toLowerCase().indexOf(nextKeyword.toLowerCase());
+          if (nextKeywordIndex !== -1 && nextKeywordIndex < endPoint) {
+            endPoint = nextKeywordIndex;
+          }
+        }
+      });
+
+      const content = relevantText.substring(0, endPoint).trim();
+      if (!content) return null;
+
+      const variants = [];
+      const variantRegex = /\*\s*(Variant [A-Z]):\s*([\s\S]*?)\s*\*\s*(?:\*)?Rationale(?:\*)?:\s*([\s\S]*?)(?=\*\s*Variant [A-Z]:|\s*$)/gi;
+      let match;
+      while((match = variantRegex.exec(content)) !== null) {
+        variants.push({
+          name: match[1].trim(),
+          text: match[2].trim(),
+          rationale: match[3].trim()
+        });
+      }
+
+      if (variants.length === 0) return null;
+
+      return (
+        <div key={title} className="mb-4">
+          <h5 className="text-md font-semibold mt-3 mb-2 text-gray-700">{title}:</h5>
+          {variants.map((variant, index) => (
+            <div key={index} className="p-3 my-2 border rounded-lg bg-gray-50 shadow-sm">
+              <p className="font-medium text-gray-800">{variant.name}: <span className="font-normal">{variant.text}</span></p>
+              <p className="text-sm text-gray-600 mt-1"><em>Rationale:</em> {variant.rationale}</p>
+            </div>
+          ))}
+        </div>
+      );
+    };
+
+    // Use key phrases that are less prone to markdown formatting variations for initial detection
+    const subjectSuggestions = parseCategory("Subject Line Variants", "Subject Line A/B Tests", abText);
+    const hookSuggestions = parseCategory("Opening Hook Variants", "Opening Hook A/B Tests", abText);
+    const ctaSuggestions = parseCategory("Call to Action (CTA) Phrase Variants", "CTA Phrase A/B Tests", abText);
+
+    if (subjectSuggestions) sections.push(subjectSuggestions);
+    if (hookSuggestions) sections.push(hookSuggestions);
+    if (ctaSuggestions) sections.push(ctaSuggestions);
+
+    if (sections.length === 0) {
+        // Fallback if specific parsing fails but content exists
+        return (
+            <div className="mt-6 pt-4 border-t border-dashed border-gray-300">
+                <h4 className="text-lg font-semibold text-gray-800 mb-3">A/B Testing Suggestions</h4>
+                <div className="bg-gray-50 p-4 rounded-lg shadow" dangerouslySetInnerHTML={{__html: formatText(abText, true)}} />
+            </div>
+        )
+    }
+    return (
+        <div className="mt-6 pt-4 border-t border-dashed border-gray-300">
+            <h4 className="text-lg font-semibold text-gray-800 mb-3 flex items-center">
+                <Layout className="h-5 w-5 mr-2 text-blue-500" /> A/B Testing Suggestions
+            </h4>
+            {sections}
+        </div>
+    );
+  };
+
+
+  const hasContent = businessInsightsContent || designAuditContent || performanceOverviewContent || rawEmailBlockContent;
 
   if (!hasContent && text) { // Fallback if no known sections are extracted but text exists
     return (
@@ -232,7 +336,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
       )}
       
       {/* Email Section */}
-      {emailContent && (
+      {rawEmailBlockContent && (
         <section className="bg-white p-8 rounded-xl shadow-lg border border-emerald-200 transition-all hover:shadow-xl">
           <h2 className="text-2xl font-bold flex gap-2 items-center text-gray-800 mb-6 border-b border-emerald-100 pb-3">
             <Clipboard className="text-emerald-600 h-6 w-6" />
@@ -244,12 +348,13 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
              </div>
             <div 
               className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-8 pl-10 rounded-xl text-gray-800 leading-relaxed border-l-4 border-emerald-500 shadow-sm"
-              dangerouslySetInnerHTML={{ __html: formatText(emailContent) }}
+              dangerouslySetInnerHTML={{ __html: formatText(mainEmailContent) }}
             />
           </div>
+          {parseAndRenderABSuggestions(abTestingSuggestionsContent)}
           <div className="mt-6 flex justify-end"> {/* Increased margin top */}
             <button 
-              onClick={copyEmailToClipboard}
+              onClick={copyEmailToClipboard} {/* This will now copy only mainEmailContent */}
               className={`${copied ? 'bg-green-600' : 'bg-emerald-600 hover:bg-emerald-700'} text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-md hover:shadow-lg text-sm font-medium`}
             >
               {copied ? (

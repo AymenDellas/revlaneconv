@@ -55,6 +55,29 @@ Aymen
 Revlane | Conversion-Focused Landing Pages
 https://revlane.tech
 
+**A/B TESTING SUGGESTIONS FOR EMAIL OUTREACH:** (Important: Output this subsection with this exact header if A/B suggestions are generated)
+Based on the email you drafted above, provide the following A/B testing options to help optimize its effectiveness:
+
+1.  **Subject Line Variants (Suggest 2-3):**
+    *   **Variant A:** [Generated Subject Line A]
+        *   *Rationale:* [Briefly explain why this variant might be effective, e.g., "More direct and benefit-oriented."]
+    *   **Variant B:** [Generated Subject Line B]
+        *   *Rationale:* [Briefly explain, e.g., "Uses a curiosity hook."]
+    *   (If a third is generated) **Variant C:** [Generated Subject Line C]
+        *   *Rationale:* [Briefly explain]
+
+2.  **Opening Hook Variants (Suggest 1-2 for the first sentence of the email body):**
+    *   **Hook Variant 1:** [Generated Opening Hook 1]
+        *   *Rationale:* [Briefly explain, e.g., "More personalized by referencing X."]
+    *   **Hook Variant 2:** [Generated Opening Hook 2]
+        *   *Rationale:* [Briefly explain, e.g., "Gets straight to the main problem identified."]
+
+3.  **Call to Action (CTA) Phrase Variants (Suggest 1-2 for the reply prompt):**
+    *   **CTA Variant 1:** [Generated CTA Phrase 1, e.g., "Keen to explore?"]
+        *   *Rationale:* [Briefly explain, e.g., "Softer, more exploratory language."]
+    *   **CTA Variant 2:** [Generated CTA Phrase 2, e.g., "Show me."]
+        *   *Rationale:* [Briefly explain, e.g., "More direct and action-oriented."]
+
 **Output Instructions:**
 *   All output should be direct narrative.
 *   No markdown formatting in the final AI response (the frontend will handle formatting).
