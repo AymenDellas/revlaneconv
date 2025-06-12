@@ -5,18 +5,6 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
   // State for copy button
   const [copied, setCopied] = useState(false);
   
-  // Function to copy email content to clipboard
-  const copyEmailToClipboard = () => {
-    const emailContent = extractEmailSection(text);
-    if (emailContent) {
-      // Remove HTML tags for clean copy
-      const plainText = emailContent.replace(/<[^>]*>/g, '');
-      navigator.clipboard.writeText(plainText).then(() => {
-        setCopied(true);
-        setTimeout(() => setCopied(false), 2000);
-      });
-    }
-  };
   // Section headers from the prompt
   const HEADERS = {
     BUSINESS_INSIGHTS: "BUSINESS INSIGHTS", // Original prompt name
@@ -43,7 +31,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
     const match = text.match(regex);
     return match && match[1] ? match[1].trim() : '';
   };
-  
+
   const fullText = text; // Keep original text for reference
 
   // Extract all potential sections
@@ -71,12 +59,6 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
 
   // Format the text with markdown (minor adjustments for clarity)
   const formatText = (content: string, isListItemContext = false) => {
-    // Add line breaks first
-    let formatted = content
-      // Preserve line breaks
-      .replace(/\n/g, '<br />');
-      
-    // Replace markdown-style headers and lists with HTML
     let formatted = content;
     // Basic formatting - bold, italic. Headers are less likely inside these smaller content blocks.
     formatted = formatted
