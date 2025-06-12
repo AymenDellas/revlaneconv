@@ -19,7 +19,7 @@ Provide scores (1-10, 1=poor, 10=excellent). Be critical and justify scores brie
 4.  **Content & Copy Effectiveness:** Score: [X/10]. Justification: [Your justification]. Is the copy persuasive, clear, concise, and targeted to the persona? Does it address pain points and highlight benefits?
 5.  **Mobile Readiness & UX (Structural Assessment):** (Important: Present this subsection with the exact title "MOBILE READINESS SCORE (1-10):" followed by your score [X/10]) Score: [X/10]. Justification: [Your justification]. Based on HTML structure (viewport, responsive patterns), how likely is this page to offer a good mobile UX? Note key indicators.
 
-**IV. TOP 3 CONVERSION KILLERS & ACTIONABLE FIXES:** (Important: This section is for detailed analysis. The frontend `ResultsDisplay.tsx` component will need updates to parse this specific "Issue / Actionable Fix" format. For now, maintain this detailed structure as it's best for quality analysis.)
+**IV. TOP 3 CONVERSION KILLERS & ACTIONABLE FIXES:**
 Identify the **three most critical issues** from your audit that are likely hindering conversion the most. These must be specific, observable problems from the HTML/data provided. For each issue:
 *   **Issue [Number]:** [Clear description of the problem and *why* it's a problem for conversion].
 *   **Actionable Fix:** [Specific, practical suggestion to fix it. Explain the *expected positive outcome* of this fix].
