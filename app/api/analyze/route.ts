@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { analyzeWebsite } from "@/app/lib/analyzeWebsite";
 import { getWebsiteHtml } from "@/app/lib/getWebsiteHtml";
+import { fetchPageSpeedInsights } from "@/app/lib/getPageSpeedInsights";
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,8 +30,22 @@ export async function POST(req: NextRequest) {
     console.log(`[API] Fetching HTML for: ${url}`);
     const html = await getWebsiteHtml(url);
 
-    console.log(`[API] Analyzing HTML for: ${url}`);
-    const analysis = await analyzeWebsite(html);
+    let pageSpeedData = null;
+    try {
+      console.log(`[API] Fetching PageSpeed Insights for: ${url}`);
+      pageSpeedData = await fetchPageSpeedInsights(url);
+      if (pageSpeedData && pageSpeedData.error) {
+        console.warn(`[API] PageSpeed Insights issue: ${pageSpeedData.error} for ${url}`);
+        // Logged the warning, proceed without PageSpeed data if there was a configuration error or API error.
+        pageSpeedData = null;
+      }
+    } catch (psError: any) {
+      console.error(`[API] Error fetching PageSpeed Insights for ${url}:`, psError.message);
+      // pageSpeedData will remain null
+    }
+
+    console.log(`[API] Analyzing HTML and PageSpeed data (if available) for: ${url}`);
+    const analysis = await analyzeWebsite(html, pageSpeedData);
 
     console.log(`[API] Analysis successful for: ${url}`);
     return NextResponse.json({ analysis }, { status: 200 });
