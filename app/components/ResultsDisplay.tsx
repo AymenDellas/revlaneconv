@@ -119,7 +119,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
     
     return formatted;
     */
-    return content; // Return content as is, or a static string like "<p>Formatting disabled.</p>"
+    return content;
   };
 
   // Helper to render a sub-section, e.g. Persona, Mobile Score
