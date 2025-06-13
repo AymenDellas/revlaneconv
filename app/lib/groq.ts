@@ -29,31 +29,38 @@ Identify the **three most critical issues** from your audit that are likely hind
 Briefly comment on Google PageSpeed metrics. Is the Performance Score good (90-100), needs improvement (50-89), or poor (0-49)? Note any critical specific metrics (LCP, CLS) and suggest that improving these could enhance user experience and conversion.
 
 **VI. PERSONALIZED EMAIL FRAMEWORK:** (Important: Output this section with the exact header: "PERSONALIZED EMAIL FRAMEWORK")
-Craft a compelling, concise cold email. Fill in all placeholders. The tone should be helpful, expert, and intriguing.
+Craft a compelling, concise cold email. The placeholder `[URL]` should be replaced with the specific website URL you analyzed. The placeholder `[First Name]` should be kept as is. For `[specific friction from audit]`, select the most impactful single issue from your 'TOP 3 CONVERSION KILLERS' analysis that directly affects signups or primary conversion goals and concisely describe it. For `[Personalized reason: ...]`, craft a sentence that starts with 'Your [element related to their site/business] shows you understand/appreciate [their likely target audience or a positive aspect], but [a related problem/opportunity identified in your audit] may be holding it back from its full potential.'
 
-Subject: Idea to potentially boost [Their Website Name]'s results
+Subject: You’re 1 of 3 - free rebuild offer
 
-Hi [First Name],
+Hey [First Name],
 
-I was on [Their Website Name] and was impressed by [mention a specific positive aspect or unique element you observed from the website data - e.g., 'the innovative approach to X,' 'the clear passion for Y,' 'the unique Z feature'].
+Just dissected [URL]. Hard truth:
+Your traffic deserves better conversions. I spotted [specific friction from audit] killing your signups.
 
-My agency, Revlane (revlane.tech), specializes in turning landing pages into high-performing conversion assets. From my brief review, I spotted a few opportunities that, if addressed, could significantly enhance user engagement and sales for [Their Website Name]:
+My offer:
+🛠️ I'll rebuild your weakest page – mobile-ready, dev included – laser-focused on conversion science.
+**100% free.** Zero cost to you.
 
-👉 **[Issue 1 Description - concisely summarize the problem from your "TOP 3" analysis]** (e.g., "The main call-to-action could be clearer and more prominent to guide users effectively.")
-👉 **[Issue 2 Description - concisely summarize the problem]** (e.g., "Key trust signals seem to be missing above the fold, which might cause hesitation.")
-👉 **[Issue 3 Description - concisely summarize the problem]** (e.g., "The mobile view appears to have some layout challenges impacting readability.")
+Why free?
+I'm handpicking 3 standout companies to build Revlane's launch portfolio. You fit because:
+"[Personalized reason: 'Your [element] shows you get [audience], but [problem] holds it back']"
 
-We believe small, strategic tweaks can make a big difference.
+You walk away with:
+• Message that cuts through noise
+• UX that guides to action
+• Page built for *conversions*, not vanity
 
-Here’s a thought: we'd be happy to create a refined, high-converting concept of your landing page, completely free, to demonstrate the potential. If you see a marked improvement, perhaps we can discuss how Revlane could further help you achieve your goals.
+Reply "Upgrade" + answer:
+_What conversion hurdle keeps you up at night?_
 
-Interested in seeing what's possible? Just reply "tell me more" and I'll share the details.
+Only 3 spots. Yours expires 27/06/2025.
 
-Best regards,
-
-Aymen
-Revlane | Conversion-Focused Landing Pages
+— Aymen
+Founder, Revlane
 https://revlane.tech
+
+P.S. This is strictly portfolio-building – you get a high-converting page, I get to showcase smart work. Win-win.
 
 **A/B TESTING SUGGESTIONS FOR EMAIL OUTREACH:** (Important: Output this subsection with this exact header if A/B suggestions are generated)
 Based on the email you drafted above, provide the following A/B testing options to help optimize its effectiveness:
@@ -82,7 +89,7 @@ Based on the email you drafted above, provide the following A/B testing options 
 *   All output should be direct narrative.
 *   No markdown formatting in the final AI response (the frontend will handle formatting).
 *   No extra explanation beyond what's requested in each section.
-*   Fill in all placeholders like [Their Website Name], [First Name], [What They Offer], [Issue X Description], [specific positive aspect].
+*   Fill in all placeholders. Remember to use the actual website URL for `[URL]`. Other placeholders like `[First Name]`, `[specific friction from audit]`, and `[Personalized reason: ...]` should be filled based on your analysis and the instructions provided for them.
 `;
 
 export async function callGroq(htmlContent: string): Promise<string> {
