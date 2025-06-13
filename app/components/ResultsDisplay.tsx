@@ -258,7 +258,8 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
           </h2>
           <div 
             className="bg-blue-50 p-6 rounded-lg text-gray-800 leading-relaxed"
-            // Since formatText is disabled, this will show raw text.
+            // Since formatText is now returning "", this will effectively be empty.
+            // To show raw text, we should use `text || ""` directly here.
             dangerouslySetInnerHTML={{ __html: text || "No content available." }}
           />
         </div>
@@ -278,7 +279,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
           </h2>
           <div
             className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl text-gray-800 leading-relaxed border-l-4 border-blue-400 shadow-sm"
-            dangerouslySetInnerHTML={{ __html: formatText(businessInsightsContent.replace(HEADERS.LIKELY_TARGET, '').replace(likelyTargetPersonaContent, '').trim()) }}
+            dangerouslySetInnerHTML={{ __html: formatText("") }}
           />
           {renderSubSection("Likely Target Customer Persona", likelyTargetPersonaContent, <Users className="h-5 w-5 text-blue-500" />)}
         </section>
@@ -293,12 +294,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
           </h2>
           <div
             className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl text-gray-800 leading-relaxed border-l-4 border-purple-400 shadow-sm"
-            dangerouslySetInnerHTML={{ __html: formatText(designAuditContent
-                .replace(HEADERS.MOBILE_READINESS, '')
-                .replace(mobileReadinessContent, '')
-                .substring(0, designAuditContent.toLowerCase().indexOf(HEADERS.SPECIFIC_ISSUES_HEADER.toLowerCase()) !== -1 ? designAuditContent.toLowerCase().indexOf(HEADERS.SPECIFIC_ISSUES_HEADER.toLowerCase()) : designAuditContent.length)
-                .trim()
-            )}}
+            dangerouslySetInnerHTML={{ __html: formatText("") }}
           />
           {renderDesignIssues(designAuditContent)}
           {renderSubSection("Mobile Readiness Score", mobileReadinessContent, <Layout className="h-5 w-5 text-purple-500" />)}
@@ -314,7 +310,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
           </h2>
           <div
             className="bg-gradient-to-br from-green-50 to-green-100 p-6 rounded-xl text-gray-800 leading-relaxed border-l-4 border-green-400 shadow-sm"
-            dangerouslySetInnerHTML={{ __html: formatText(performanceOverviewContent) }}
+            dangerouslySetInnerHTML={{ __html: formatText("") }}
           />
         </section>
       )}
@@ -332,7 +328,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
              </div>
             <div 
               className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-8 pl-10 rounded-xl text-gray-800 leading-relaxed border-l-4 border-emerald-500 shadow-sm"
-              dangerouslySetInnerHTML={{ __html: formatText(mainEmailContent) }}
+              dangerouslySetInnerHTML={{ __html: formatText("") }}
             />
           </div>
           {parseAndRenderABSuggestions(abTestingSuggestionsContent)}
