@@ -86,40 +86,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
 
   // Format the text with markdown (minor adjustments for clarity)
   const formatText = (content: string, isListItemContext = false) => {
-    /*
-    let formatted = content;
-    formatted = formatted
-      .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-      .replace(/\*(.+?)\*/g, '<em>$1</em>');
-
-    const lines = formatted.split(/\n|<br \/>/);
-    let inList = false;
-    formatted = lines.map(line => {
-      line = line.trim();
-      if (/^• |^\* |^\d+\. /.test(line)) {
-        const listItem = `<li class="ml-4 mb-1">${line.replace(/^• |^\* |^\d+\. /, '')}</li>`;
-        if (!inList) {
-          inList = true;
-          return `<ul class="my-1 list-disc list-inside">${listItem}`;
-        }
-        return listItem;
-      } else {
-        if (inList) {
-          inList = false;
-          return `</ul>${line ? `<p class="my-1">${line}</p>` : ''}`;
-        }
-        return line ? (isListItemContext ? line : `<p class="my-1">${line}</p>`) : '';
-      }
-    }).join('');
-    if (inList) {
-      formatted += '</ul>';
-    }
-    
-    formatted = formatted.replace(/\n/g, '<br />');
-    
-    return formatted;
-    */
-    return content;
+    return ""; // Returning an empty string for maximum safety during this debug.
   };
 
   // Helper to render a sub-section, e.g. Persona, Mobile Score
@@ -141,7 +108,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
     */
     return null;
   };
-  
+
   // Enhanced function to parse and render "3 specific issues" with suggestions
   const renderDesignIssues = (designAuditText: string) => {
     /*
