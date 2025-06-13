@@ -221,7 +221,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
           {variants.map((variant, index) => (
             <div key={index} className="p-3 my-2 border rounded-lg bg-gray-50 shadow-sm">
               <p className="font-medium text-gray-800">{variant.name}: <span className="font-normal">{variant.text}</span></p>
-              <p className="text-sm text-gray-600 mt-1"><em>Rationale:</em> {variant.rationale}</p>
+              <p className="text-sm text-gray-600 mt-1"><em>Rationale:</em> {rationale}</p>
             </div>
           ))}
         </div>
@@ -244,7 +244,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
                 <h4 className="text-lg font-semibold text-gray-800 mb-3">A/B Testing Suggestions</h4>
                 <div className="bg-gray-50 p-4 rounded-lg shadow" dangerouslySetInnerHTML={{__html: formatText(abText, true)}} />
             </div>
-        )
+        );
     }
     return (
         <div className="mt-6 pt-4 border-t border-dashed border-gray-300">
@@ -274,7 +274,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
         </div>
       </section>
     );
-  }
+  }; // Explicit semicolon
 
 
   return (
