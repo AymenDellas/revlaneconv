@@ -17,22 +17,8 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
     AB_TESTING_SUGGESTIONS: "A/B TESTING SUGGESTIONS FOR EMAIL OUTREACH:"
   };
 
-  // Initialize content variables
-  const fullText = text || "";
-  const businessInsightsContent = "";
-  const likelyTargetPersonaContent = "";
-  const designAuditContent = "";
-  const mobileReadinessContent = "";
-  const performanceOverviewContent = "";
-  const rawEmailBlockContent = "";
-  let mainEmailContent = "";
-  let abTestingSuggestionsContent = "";
-  // Note: The actual extraction logic that populates these is now commented out.
-  // These are initialized to empty strings to prevent runtime errors if JSX still references them.
-
   // Function to extract a section based on a header and potential next headers
   const extractSection = (text: string, currentHeader: string, nextHeaders: string[]): string => {
-    /*
     let regexString = `${currentHeader.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([\\s\\S]*?)`;
     if (nextHeaders.length > 0) {
       regexString += `(?=${nextHeaders.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')}|$)`;
@@ -42,32 +28,31 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
     const regex = new RegExp(regexString, 'i'); // Case insensitive matching for headers
     const match = text.match(regex);
     return match && match[1] ? match[1].trim() : '';
-    */
-    return "";
   };
 
-  // const fullText = text; // Keep original text for reference - moved up
+  const fullText = text || "";
 
-  // const businessInsightsContent = extractSection(fullText, HEADERS.BUSINESS_INSIGHTS, [HEADERS.DESIGN_AUDIT, HEADERS.PERFORMANCE_OVERVIEW, HEADERS.EMAIL_FRAMEWORK]);
-  // const likelyTargetPersonaContent = extractSection(businessInsightsContent, HEADERS.LIKELY_TARGET, []);
+  // Extract all potential sections
+  const businessInsightsContent = extractSection(fullText, HEADERS.BUSINESS_INSIGHTS, [HEADERS.DESIGN_AUDIT, HEADERS.PERFORMANCE_OVERVIEW, HEADERS.EMAIL_FRAMEWORK]);
+  const likelyTargetPersonaContent = extractSection(businessInsightsContent, HEADERS.LIKELY_TARGET, []);
 
-  // const designAuditContent = extractSection(fullText, HEADERS.DESIGN_AUDIT, [HEADERS.PERFORMANCE_OVERVIEW, HEADERS.EMAIL_FRAMEWORK]);
-  // const mobileReadinessContent = extractSection(designAuditContent, HEADERS.MOBILE_READINESS, []);
+  const designAuditContent = extractSection(fullText, HEADERS.DESIGN_AUDIT, [HEADERS.PERFORMANCE_OVERVIEW, HEADERS.EMAIL_FRAMEWORK]);
+  const mobileReadinessContent = extractSection(designAuditContent, HEADERS.MOBILE_READINESS, []);
 
-  // const performanceOverviewContent = extractSection(fullText, HEADERS.PERFORMANCE_OVERVIEW, [HEADERS.EMAIL_FRAMEWORK, HEADERS.AB_TESTING_SUGGESTIONS]);
+  const performanceOverviewContent = extractSection(fullText, HEADERS.PERFORMANCE_OVERVIEW, [HEADERS.EMAIL_FRAMEWORK, HEADERS.AB_TESTING_SUGGESTIONS]);
 
-  // const rawEmailBlockContent = extractSection(fullText, HEADERS.EMAIL_FRAMEWORK, []);
+  const rawEmailBlockContent = extractSection(fullText, HEADERS.EMAIL_FRAMEWORK, []);
 
-  // mainEmailContent = rawEmailBlockContent; // Default assignment
-  // abTestingSuggestionsContent = ""; // Default assignment
+  let mainEmailContent = rawEmailBlockContent;
+  let abTestingSuggestionsContent = "";
 
-  // if (rawEmailBlockContent.includes(HEADERS.AB_TESTING_SUGGESTIONS)) {
-  //   const parts = rawEmailBlockContent.split(new RegExp(HEADERS.AB_TESTING_SUGGESTIONS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
-  //   mainEmailContent = parts[0].trim();
-  //   if (parts.length > 1) {
-  //     abTestingSuggestionsContent = parts[1].trim();
-  //   }
-  // }
+  if (rawEmailBlockContent.includes(HEADERS.AB_TESTING_SUGGESTIONS)) {
+    const parts = rawEmailBlockContent.split(new RegExp(HEADERS.AB_TESTING_SUGGESTIONS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
+    mainEmailContent = parts[0].trim();
+    if (parts.length > 1) {
+      abTestingSuggestionsContent = parts[1].trim();
+    }
+  }
 
 
   // Function to copy email content to clipboard
@@ -254,14 +239,10 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
     return null;
   };
 
-  // Determine if there's any text to display at all, even if it's unparsed.
-  // The hasContent check now depends on the raw `text` prop if specific content vars are empty.
   const hasAnyDisplayableContent = text && text.trim().length > 0;
-
 
   if (!hasAnyDisplayableContent && (businessInsightsContent || designAuditContent || performanceOverviewContent || rawEmailBlockContent)) {
      // This case should ideally not be hit if content vars are empty strings.
-     // It's a fallback for the original logic if `text` is empty but somehow old logic found content.
   } else if (!hasAnyDisplayableContent) { // If text itself is empty or only whitespace
     return (
         <section className="bg-white p-6 rounded-lg shadow-lg">
@@ -276,10 +257,6 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
     );
   }
 
-
-  // Fallback display if specific sections are not found or parsing is disabled
-  // This will show the raw text if no sections were parsed by the (now commented out) extractSection logic.
-  // Or, it shows a generic message if all content variables are empty strings.
   const showFallbackDisplay = !businessInsightsContent && !designAuditContent && !performanceOverviewContent && !rawEmailBlockContent;
 
   if (showFallbackDisplay) {
@@ -297,13 +274,13 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
         </div>
       </section>
     );
-  }; // Explicit semicolon
+  };
 
 
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* Business Insights Section */}
-      {businessInsightsContent && ( // This will be false if businessInsightsContent is ""
+      {businessInsightsContent && (
         <section className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transition-all hover:shadow-xl">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2">
             <Zap className="h-6 w-6 text-blue-600" />
@@ -311,14 +288,14 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
           </h2>
           <div
             className="bg-gradient-to-br from-blue-50 to-blue-100 p-6 rounded-xl text-gray-800 leading-relaxed border-l-4 border-blue-400 shadow-sm"
-            dangerouslySetInnerHTML={{ __html: formatText(businessInsightsContent) }}
+            dangerouslySetInnerHTML={{ __html: formatText(businessInsightsContent.replace(HEADERS.LIKELY_TARGET, '').replace(likelyTargetPersonaContent, '').trim()) }}
           />
           {renderSubSection("Likely Target Customer Persona", likelyTargetPersonaContent, <Users className="h-5 w-5 text-blue-500" />)}
         </section>
       )}
 
       {/* Design Audit Section */}
-      {designAuditContent && ( // This will be false
+      {designAuditContent && (
         <section className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transition-all hover:shadow-xl">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2">
             <Palette className="h-6 w-6 text-purple-600" />
@@ -326,7 +303,12 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
           </h2>
           <div
             className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl text-gray-800 leading-relaxed border-l-4 border-purple-400 shadow-sm"
-            dangerouslySetInnerHTML={{ __html: formatText(designAuditContent) }}
+            dangerouslySetInnerHTML={{ __html: formatText(designAuditContent
+                .replace(HEADERS.MOBILE_READINESS, '')
+                .replace(mobileReadinessContent, '')
+                .substring(0, designAuditContent.toLowerCase().indexOf(HEADERS.SPECIFIC_ISSUES_HEADER.toLowerCase()) !== -1 ? designAuditContent.toLowerCase().indexOf(HEADERS.SPECIFIC_ISSUES_HEADER.toLowerCase()) : designAuditContent.length)
+                .trim()
+            )}}
           />
           {renderDesignIssues(designAuditContent)}
           {renderSubSection("Mobile Readiness Score", mobileReadinessContent, <Layout className="h-5 w-5 text-purple-500" />)}
@@ -334,7 +316,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
       )}
 
       {/* Performance Overview Section */}
-      {performanceOverviewContent && ( // This will be false
+      {performanceOverviewContent && (
         <section className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transition-all hover:shadow-xl">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2">
             <CheckCircle className="h-6 w-6 text-green-600" />
@@ -348,7 +330,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
       )}
 
       {/* Email Section */}
-      {rawEmailBlockContent && ( // This will be false, unless text was only email framework
+      {rawEmailBlockContent && (
         <section className="bg-white p-8 rounded-xl shadow-lg border border-emerald-200 transition-all hover:shadow-xl">
           <h2 className="text-2xl font-bold flex gap-2 items-center text-gray-800 mb-6 border-b border-emerald-100 pb-3">
             <Clipboard className="text-emerald-600 h-6 w-6" />
