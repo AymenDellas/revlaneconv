@@ -89,7 +89,7 @@ Based on the email you drafted above, provide the following A/B testing options 
 *   All output should be direct narrative.
 *   No markdown formatting in the final AI response (the frontend will handle formatting).
 *   No extra explanation beyond what's requested in each section.
-*   Fill in all placeholders. Remember to use the actual website URL for `[URL]`. Other placeholders like `[First Name]`, `[specific friction from audit]`, and `[Personalized reason: ...]` should be filled based on your analysis and the instructions provided for them.
+*   Fill in all placeholders. Remember to use the actual website URL for '[URL]'. Other placeholders like '[First Name]', '[specific friction from audit]', and '[Personalized reason: ...]' should be filled based on your analysis and the instructions provided for them.
 `;
 
 export async function callGroq(htmlContent: string): Promise<string> {
