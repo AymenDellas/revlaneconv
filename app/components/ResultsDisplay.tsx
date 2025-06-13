@@ -134,8 +134,6 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
     // as its structure is very different from "Call out 3 specific issues."
     // For now, it retains its original logic.
     const issuesHeaderText = HEADERS.SPECIFIC_ISSUES_HEADER; // This header is from the OLD prompt structure.
-    // and are typically list items or numbered.
-    const issuesHeaderText = HEADERS.SPECIFIC_ISSUES_HEADER;
     const issuesStartIndex = designAuditText.toLowerCase().indexOf(issuesHeaderText.toLowerCase());
     let issuesSection = designAuditText;
 
