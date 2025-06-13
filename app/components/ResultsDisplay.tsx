@@ -7,21 +7,32 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
   
   // Section headers from the prompt
   const HEADERS = {
-    BUSINESS_INSIGHTS: "BUSINESS INSIGHTS", // Original prompt name
-    BUSINESS_SNAPSHOT: "BUSINESS SNAPSHOT", // What the component currently uses
+    BUSINESS_INSIGHTS: "BUSINESS INSIGHTS",
     LIKELY_TARGET: "LIKELY TARGET CUSTOMER PERSONA:",
-    DESIGN_AUDIT: "DESIGN AUDIT", // Original prompt name
-    DESIGN_BREAKDOWN: "DESIGN BREAKDOWN", // What the component currently uses
+    DESIGN_AUDIT: "DESIGN AUDIT",
     MOBILE_READINESS: "MOBILE READINESS SCORE (1-10):",
-    SPECIFIC_ISSUES_HEADER: "Call out 3 specific issues.", // And suggestions
+    SPECIFIC_ISSUES_HEADER: "Call out 3 specific issues.", // This is from the OLDER prompt for design issues.
     PERFORMANCE_OVERVIEW: "PERFORMANCE OVERVIEW:",
-    EMAIL_FRAMEWORK: "PERSONALIZED EMAIL FRAMEWORK", // Original prompt name
-    // EMAIL_GENERATOR: "COLD EMAIL GENERATOR" // What the component currently uses - EMAIL_FRAMEWORK is more accurate from prompt
+    EMAIL_FRAMEWORK: "PERSONALIZED EMAIL FRAMEWORK",
     AB_TESTING_SUGGESTIONS: "A/B TESTING SUGGESTIONS FOR EMAIL OUTREACH:"
   };
 
+  // Initialize content variables
+  const fullText = text || "";
+  const businessInsightsContent = "";
+  const likelyTargetPersonaContent = "";
+  const designAuditContent = "";
+  const mobileReadinessContent = "";
+  const performanceOverviewContent = "";
+  const rawEmailBlockContent = "";
+  let mainEmailContent = "";
+  let abTestingSuggestionsContent = "";
+  // Note: The actual extraction logic that populates these is now commented out.
+  // These are initialized to empty strings to prevent runtime errors if JSX still references them.
+
   // Function to extract a section based on a header and potential next headers
   const extractSection = (text: string, currentHeader: string, nextHeaders: string[]): string => {
+    /*
     let regexString = `${currentHeader.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}([\\s\\S]*?)`;
     if (nextHeaders.length > 0) {
       regexString += `(?=${nextHeaders.map(h => h.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')}|$)`;
@@ -31,38 +42,37 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
     const regex = new RegExp(regexString, 'i'); // Case insensitive matching for headers
     const match = text.match(regex);
     return match && match[1] ? match[1].trim() : '';
+    */
+    return "";
   };
 
-  const fullText = text; // Keep original text for reference
+  // const fullText = text; // Keep original text for reference - moved up
 
-  // Extract all potential sections
-  const businessInsightsContent = extractSection(fullText, HEADERS.BUSINESS_INSIGHTS, [HEADERS.DESIGN_AUDIT, HEADERS.PERFORMANCE_OVERVIEW, HEADERS.EMAIL_FRAMEWORK]);
-  const likelyTargetPersonaContent = extractSection(businessInsightsContent, HEADERS.LIKELY_TARGET, []); // It's within Business Insights
+  // const businessInsightsContent = extractSection(fullText, HEADERS.BUSINESS_INSIGHTS, [HEADERS.DESIGN_AUDIT, HEADERS.PERFORMANCE_OVERVIEW, HEADERS.EMAIL_FRAMEWORK]);
+  // const likelyTargetPersonaContent = extractSection(businessInsightsContent, HEADERS.LIKELY_TARGET, []);
 
-  const designAuditContent = extractSection(fullText, HEADERS.DESIGN_AUDIT, [HEADERS.PERFORMANCE_OVERVIEW, HEADERS.EMAIL_FRAMEWORK]);
-  const mobileReadinessContent = extractSection(designAuditContent, HEADERS.MOBILE_READINESS, []); // It's within Design Audit
-  // For "3 specific issues and suggestions", this will be more complex and might need to be handled inside the Design Audit rendering
+  // const designAuditContent = extractSection(fullText, HEADERS.DESIGN_AUDIT, [HEADERS.PERFORMANCE_OVERVIEW, HEADERS.EMAIL_FRAMEWORK]);
+  // const mobileReadinessContent = extractSection(designAuditContent, HEADERS.MOBILE_READINESS, []);
 
-  const performanceOverviewContent = extractSection(fullText, HEADERS.PERFORMANCE_OVERVIEW, [HEADERS.EMAIL_FRAMEWORK, HEADERS.AB_TESTING_SUGGESTIONS]); // A/B might follow performance if email is short
+  // const performanceOverviewContent = extractSection(fullText, HEADERS.PERFORMANCE_OVERVIEW, [HEADERS.EMAIL_FRAMEWORK, HEADERS.AB_TESTING_SUGGESTIONS]);
 
-  // Email section might contain A/B suggestions as a sub-section
-  const rawEmailBlockContent = extractSection(fullText, HEADERS.EMAIL_FRAMEWORK, []); // Get the whole block first
+  // const rawEmailBlockContent = extractSection(fullText, HEADERS.EMAIL_FRAMEWORK, []);
 
-  let mainEmailContent = rawEmailBlockContent;
-  let abTestingSuggestionsContent = "";
+  // mainEmailContent = rawEmailBlockContent; // Default assignment
+  // abTestingSuggestionsContent = ""; // Default assignment
 
-  if (rawEmailBlockContent.includes(HEADERS.AB_TESTING_SUGGESTIONS)) {
-    const parts = rawEmailBlockContent.split(new RegExp(HEADERS.AB_TESTING_SUGGESTIONS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
-    mainEmailContent = parts[0].trim();
-    if (parts.length > 1) {
-      abTestingSuggestionsContent = parts[1].trim();
-    }
-  }
+  // if (rawEmailBlockContent.includes(HEADERS.AB_TESTING_SUGGESTIONS)) {
+  //   const parts = rawEmailBlockContent.split(new RegExp(HEADERS.AB_TESTING_SUGGESTIONS.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i'));
+  //   mainEmailContent = parts[0].trim();
+  //   if (parts.length > 1) {
+  //     abTestingSuggestionsContent = parts[1].trim();
+  //   }
+  // }
 
 
   // Function to copy email content to clipboard
   const copyEmailToClipboard = () => {
-    // Copy only the main email content, not A/B suggestions
+    /*
     if (mainEmailContent) {
       const plainText = mainEmailContent.replace(/<[^>]*>/g, '').replace(/Subject:.*?\n\n/i, '').replace(/Hey \[First Name\],\n\n/i, '');
       navigator.clipboard.writeText(plainText.trim()).then(() => {
@@ -70,18 +80,18 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
         setTimeout(() => setCopied(false), 2000);
       });
     }
+    */
+    console.log("copyEmailToClipboard called, but implementation is commented out.");
   };
 
   // Format the text with markdown (minor adjustments for clarity)
   const formatText = (content: string, isListItemContext = false) => {
+    /*
     let formatted = content;
-    // Basic formatting - bold, italic. Headers are less likely inside these smaller content blocks.
     formatted = formatted
       .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.+?)\*/g, '<em>$1</em>');
 
-    // Handle lists carefully: only wrap if it looks like a list.
-    // Preserve line breaks from input for other text.
     const lines = formatted.split(/\n|<br \/>/);
     let inList = false;
     formatted = lines.map(line => {
@@ -98,21 +108,23 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
           inList = false;
           return `</ul>${line ? `<p class="my-1">${line}</p>` : ''}`;
         }
-        return line ? (isListItemContext ? line : `<p class="my-1">${line}</p>`) : ''; // Avoid empty paragraphs, unless it's a list item context
+        return line ? (isListItemContext ? line : `<p class="my-1">${line}</p>`) : '';
       }
     }).join('');
     if (inList) {
-      formatted += '</ul>'; // Close any open list
+      formatted += '</ul>';
     }
     
-    // General line breaks for non-list, non-paragraph content (if any left)
     formatted = formatted.replace(/\n/g, '<br />');
     
     return formatted;
+    */
+    return content; // Return content as is, or a static string like "<p>Formatting disabled.</p>"
   };
 
   // Helper to render a sub-section, e.g. Persona, Mobile Score
   const renderSubSection = (title: string, content: string, icon?: React.ReactNode) => {
+    /*
     if (!content.trim()) return null;
     return (
       <div className="mt-4 pt-3 border-t border-gray-200">
@@ -126,19 +138,18 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
         />
       </div>
     );
+    */
+    return null;
   };
   
   // Enhanced function to parse and render "3 specific issues" with suggestions
   const renderDesignIssues = (designAuditText: string) => {
-    // This function might need significant rework if the "TOP 3 CONVERSION KILLERS" prompt section is used,
-    // as its structure is very different from "Call out 3 specific issues."
-    // For now, it retains its original logic.
-    const issuesHeaderText = HEADERS.SPECIFIC_ISSUES_HEADER; // This header is from the OLD prompt structure.
+    /*
+    const issuesHeaderText = HEADERS.SPECIFIC_ISSUES_HEADER;
     const issuesStartIndex = designAuditText.toLowerCase().indexOf(issuesHeaderText.toLowerCase());
     let issuesSection = designAuditText;
 
     if (issuesStartIndex !== -1) {
-        // Try to isolate the issues part more accurately, stopping before "MOBILE READINESS SCORE" or end of section
         const mobileReadinessIndex = designAuditText.toLowerCase().indexOf(HEADERS.MOBILE_READINESS.toLowerCase());
         if (mobileReadinessIndex > issuesStartIndex) {
             issuesSection = designAuditText.substring(issuesStartIndex + issuesHeaderText.length, mobileReadinessIndex);
@@ -146,15 +157,11 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
             issuesSection = designAuditText.substring(issuesStartIndex + issuesHeaderText.length);
         }
     } else {
-        // If specific header not found, try to render what we can from designAuditContent excluding mobile score
         issuesSection = designAuditText.replace(HEADERS.MOBILE_READINESS, "").replace(mobileReadinessContent, "").trim();
     }
 
     if (!issuesSection.trim()) return <p className="text-sm text-gray-500">No specific design issues detailed.</p>;
 
-    // This is a simplified display. Actual AI output structure for issues/suggestions will determine
-    // if more complex parsing (e.g. splitting each issue and its suggestion) is needed.
-    // For now, we format the whole block.
     return (
          <div className="mt-4 pt-3 border-t border-gray-200">
             <h4 className="text-md font-semibold text-gray-700 mb-1 flex items-center">
@@ -167,41 +174,33 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
             />
         </div>
     );
+    */
+    return null;
   };
 
   const parseAndRenderABSuggestions = (abText: string) => {
+    /*
     if (!abText.trim()) return null;
 
     const sections = [];
 
-    // Helper to parse each A/B test category (Subject, Hook, CTA)
     const parseCategory = (keyPhrase: string, title: string, fullAbText: string) => {
-      // Find the starting point of the category based on the key phrase
       const keyPhraseIndex = fullAbText.toLowerCase().indexOf(keyPhrase.toLowerCase());
       if (keyPhraseIndex === -1) return null;
-
-      // Extract text from the start of the key phrase
       let relevantText = fullAbText.substring(keyPhraseIndex);
-
-      // Remove the key phrase itself to get to the content
       relevantText = relevantText.substring(keyPhrase.length);
-
-      // Determine the end point (start of next A/B category or end of string)
       const nextCategoryKeywords = ["Subject Line Variants", "Opening Hook Variants", "Call to Action (CTA) Phrase Variants"];
       let endPoint = relevantText.length;
-
       nextCategoryKeywords.forEach(nextKeyword => {
-        if (nextKeyword.toLowerCase() !== keyPhrase.toLowerCase()) { // Don't use the current keyphrase to delimit itself
+        if (nextKeyword.toLowerCase() !== keyPhrase.toLowerCase()) {
           const nextKeywordIndex = relevantText.toLowerCase().indexOf(nextKeyword.toLowerCase());
           if (nextKeywordIndex !== -1 && nextKeywordIndex < endPoint) {
             endPoint = nextKeywordIndex;
           }
         }
       });
-
       const content = relevantText.substring(0, endPoint).trim();
       if (!content) return null;
-
       const variants = [];
       const variantRegex = /\*\s*(Variant [A-Z]):\s*([\s\S]*?)\s*\*\s*(?:\*)?Rationale(?:\*)?:\s*([\s\S]*?)(?=\*\s*Variant [A-Z]:|\s*$)/gi;
       let match;
@@ -212,9 +211,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
           rationale: match[3].trim()
         });
       }
-
       if (variants.length === 0) return null;
-
       return (
         <div key={title} className="mb-4">
           <h5 className="text-md font-semibold mt-3 mb-2 text-gray-700">{title}:</h5>
@@ -228,7 +225,6 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
       );
     };
 
-    // Use key phrases that are less prone to markdown formatting variations for initial detection
     const subjectSuggestions = parseCategory("Subject Line Variants", "Subject Line A/B Tests", abText);
     const hookSuggestions = parseCategory("Opening Hook Variants", "Opening Hook A/B Tests", abText);
     const ctaSuggestions = parseCategory("Call to Action (CTA) Phrase Variants", "CTA Phrase A/B Tests", abText);
@@ -238,7 +234,6 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
     if (ctaSuggestions) sections.push(ctaSuggestions);
 
     if (sections.length === 0) {
-        // Fallback if specific parsing fails but content exists
         return (
             <div className="mt-6 pt-4 border-t border-dashed border-gray-300">
                 <h4 className="text-lg font-semibold text-gray-800 mb-3">A/B Testing Suggestions</h4>
@@ -254,22 +249,50 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
             {sections}
         </div>
     );
+    */
+    return null;
   };
 
+  // Determine if there's any text to display at all, even if it's unparsed.
+  // The hasContent check now depends on the raw `text` prop if specific content vars are empty.
+  const hasAnyDisplayableContent = text && text.trim().length > 0;
 
-  const hasContent = businessInsightsContent || designAuditContent || performanceOverviewContent || rawEmailBlockContent;
 
-  if (!hasContent && text) { // Fallback if no known sections are extracted but text exists
+  if (!hasAnyDisplayableContent && (businessInsightsContent || designAuditContent || performanceOverviewContent || rawEmailBlockContent)) {
+     // This case should ideally not be hit if content vars are empty strings.
+     // It's a fallback for the original logic if `text` is empty but somehow old logic found content.
+  } else if (!hasAnyDisplayableContent) { // If text itself is empty or only whitespace
+    return (
+        <section className="bg-white p-6 rounded-lg shadow-lg">
+            <div className="mb-6">
+                <h2 className="text-2xl font-bold flex gap-2 items-center text-gray-800 mb-4">
+                    <FileText className="text-blue-600 h-6 w-6" />
+                    Analysis Results
+                </h2>
+                <p className="text-gray-600">No analysis results to display. Please provide some text.</p>
+            </div>
+        </section>
+    );
+  }
+
+
+  // Fallback display if specific sections are not found or parsing is disabled
+  // This will show the raw text if no sections were parsed by the (now commented out) extractSection logic.
+  // Or, it shows a generic message if all content variables are empty strings.
+  const showFallbackDisplay = !businessInsightsContent && !designAuditContent && !performanceOverviewContent && !rawEmailBlockContent;
+
+  if (showFallbackDisplay) {
     return (
       <section className="bg-white p-6 rounded-lg shadow-lg">
         <div className="mb-6">
           <h2 className="text-2xl font-bold flex gap-2 items-center text-gray-800 mb-4">
             <FileText className="text-blue-600 h-6 w-6" />
-            Analysis Results
+            Analysis Results (Fallback)
           </h2>
           <div 
             className="bg-blue-50 p-6 rounded-lg text-gray-800 leading-relaxed"
-            dangerouslySetInnerHTML={{ __html: formatText(text.trim()) }} // Use the general formatter
+            // Since formatText is disabled, this will show raw text.
+            dangerouslySetInnerHTML={{ __html: text || "No content available." }}
           />
         </div>
       </section>
@@ -280,7 +303,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
   return (
     <div className="space-y-8 max-w-4xl mx-auto">
       {/* Business Insights Section */}
-      {businessInsightsContent && (
+      {businessInsightsContent && ( // This will be false if businessInsightsContent is ""
         <section className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transition-all hover:shadow-xl">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2">
             <Zap className="h-6 w-6 text-blue-600" />
@@ -295,7 +318,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
       )}
 
       {/* Design Audit Section */}
-      {designAuditContent && (
+      {designAuditContent && ( // This will be false
         <section className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transition-all hover:shadow-xl">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2">
             <Palette className="h-6 w-6 text-purple-600" />
@@ -303,13 +326,9 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
           </h2>
           <div
             className="bg-gradient-to-br from-purple-50 to-purple-100 p-6 rounded-xl text-gray-800 leading-relaxed border-l-4 border-purple-400 shadow-sm"
-            // Display general design audit text, excluding already parsed sub-sections to avoid duplication.
-            // This is tricky because "3 issues" is part of the main content.
-            // We will render the "3 issues" part separately using renderDesignIssues.
             dangerouslySetInnerHTML={{ __html: formatText(designAuditContent
                 .replace(HEADERS.MOBILE_READINESS, '')
                 .replace(mobileReadinessContent, '')
-                // Heuristic: Attempt to remove the detailed issues section from the main display if it was parsed by renderDesignIssues
                 .substring(0, designAuditContent.toLowerCase().indexOf(HEADERS.SPECIFIC_ISSUES_HEADER.toLowerCase()) !== -1 ? designAuditContent.toLowerCase().indexOf(HEADERS.SPECIFIC_ISSUES_HEADER.toLowerCase()) : designAuditContent.length)
                 .trim()
             )}}
@@ -320,7 +339,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
       )}
 
       {/* Performance Overview Section */}
-      {performanceOverviewContent && (
+      {performanceOverviewContent && ( // This will be false
         <section className="bg-white p-8 rounded-xl shadow-lg border border-gray-200 transition-all hover:shadow-xl">
           <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-3 flex items-center gap-2">
             <CheckCircle className="h-6 w-6 text-green-600" />
@@ -332,9 +351,9 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
           />
         </section>
       )}
-      
+
       {/* Email Section */}
-      {rawEmailBlockContent && (
+      {rawEmailBlockContent && ( // This will be false, unless text was only email framework
         <section className="bg-white p-8 rounded-xl shadow-lg border border-emerald-200 transition-all hover:shadow-xl">
           <h2 className="text-2xl font-bold flex gap-2 items-center text-gray-800 mb-6 border-b border-emerald-100 pb-3">
             <Clipboard className="text-emerald-600 h-6 w-6" />
@@ -342,7 +361,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
           </h2>
           <div className="relative">
              <div className="absolute -left-3 top-3 h-8 w-8 bg-emerald-500 rounded-full flex items-center justify-center shadow-md">
-               <ArrowUpCircle className="text-white h-5 w-5" /> {/* Changed Icon */}
+               <ArrowUpCircle className="text-white h-5 w-5" />
              </div>
             <div 
               className="bg-gradient-to-br from-emerald-50 to-emerald-100 p-8 pl-10 rounded-xl text-gray-800 leading-relaxed border-l-4 border-emerald-500 shadow-sm"
@@ -350,9 +369,9 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
             />
           </div>
           {parseAndRenderABSuggestions(abTestingSuggestionsContent)}
-          <div className="mt-6 flex justify-end"> {/* Increased margin top */}
+          <div className="mt-6 flex justify-end">
             <button 
-              onClick={copyEmailToClipboard} {/* This will now copy only mainEmailContent */}
+              onClick={copyEmailToClipboard}
               className={`${copied ? 'bg-green-600' : 'bg-emerald-600 hover:bg-emerald-700'} text-white px-5 py-2.5 rounded-lg flex items-center gap-2 transition-all shadow-md hover:shadow-lg text-sm font-medium`}
             >
               {copied ? (
@@ -362,7 +381,7 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
                 </>
               ) : (
                 <>
-                  <Clipboard className="h-5 w-5" /> {/* Use Clipboard icon */}
+                  <Clipboard className="h-5 w-5" />
                   Copy Email
                 </>
               )}
@@ -370,6 +389,24 @@ export const ResultsDisplay = ({ text }: { text: string }) => {
           </div>
         </section>
       )}
+
+      {/* Fallback: If all specific content vars are empty, but `text` prop has data, show it unparsed. */}
+      {!(businessInsightsContent || designAuditContent || performanceOverviewContent || rawEmailBlockContent) && text && text.trim().length > 0 && (
+         <section className="bg-white p-6 rounded-lg shadow-lg">
+           <div className="mb-6">
+             <h2 className="text-2xl font-bold flex gap-2 items-center text-gray-800 mb-4">
+               <FileText className="text-blue-600 h-6 w-6" />
+               Raw Analysis Output
+             </h2>
+             <div
+               className="bg-gray-100 p-6 rounded-lg text-gray-800 leading-relaxed whitespace-pre-wrap"
+             >
+              {text}
+             </div>
+           </div>
+         </section>
+      )}
+
     </div>
   );
 };
