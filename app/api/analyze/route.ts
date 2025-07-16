@@ -20,7 +20,9 @@ export async function POST(req: NextRequest) {
     // Validate URL
     if (!url || typeof url !== "string") {
       return NextResponse.json(
-        { error: "Invalid or missing URL. Please provide a valid website URL." },
+        {
+          error: "Invalid or missing URL. Please provide a valid website URL.",
+        },
         { status: 400 }
       );
     }
@@ -38,7 +40,10 @@ export async function POST(req: NextRequest) {
     console.error("[API] Error:", err);
 
     // More specific error responses based on error message
-    if (err.message.includes("API key") || err.message.includes("configuration")) {
+    if (
+      err.message.includes("API key") ||
+      err.message.includes("configuration")
+    ) {
       return NextResponse.json(
         { error: "Service configuration error. Please try again later." },
         { status: 500 }
@@ -55,20 +60,47 @@ export async function POST(req: NextRequest) {
       );
     }
     */
-
-    if (err.message.includes("fetch") || err.message.includes("not found") || err.message.includes("connection")) {
+    if (err.message.includes("Status: 403")) {
       return NextResponse.json(
-        { error: "Could not access the website. Please check the URL and try again." },
+        {
+          error: "Website blocked the request",
+          details: "The target website has anti-bot protection. Solutions:",
+          solutions: [
+            "Try again later",
+            "Use a professional scraping service",
+            "Implement proxy rotation",
+          ],
+          technicalDetails: err.message,
+        },
+        { status: 403 }
+      );
+    }
+    if (
+      err.message.includes("fetch") ||
+      err.message.includes("not found") ||
+      err.message.includes("connection")
+    ) {
+      return NextResponse.json(
+        {
+          error:
+            "Could not access the website. Please check the URL and try again.",
+        },
         { status: 400 }
       );
     }
 
-    if (err.message.includes("HTML") || err.message.includes("content") || err.message.includes("empty") || err.message.includes("protected")) {
+    if (
+      err.message.includes("HTML") ||
+      err.message.includes("content") ||
+      err.message.includes("empty") ||
+      err.message.includes("protected")
+    ) {
       return NextResponse.json(
-        { 
-          error: "Could not extract sufficient content from the website.", 
-          details: "This could happen if the website is using advanced protection, requires JavaScript that we can't execute, or has very little content. You might want to try a different URL or a simpler website.",
-          originalError: err.message
+        {
+          error: "Could not extract sufficient content from the website.",
+          details:
+            "This could happen if the website is using advanced protection, requires JavaScript that we can't execute, or has very little content. You might want to try a different URL or a simpler website.",
+          originalError: err.message,
         },
         { status: 422 }
       );
@@ -76,7 +108,11 @@ export async function POST(req: NextRequest) {
 
     // Generic error handler for all other cases
     return NextResponse.json(
-      { error: err.message || "An unexpected error occurred during analysis. Please try again." },
+      {
+        error:
+          err.message ||
+          "An unexpected error occurred during analysis. Please try again.",
+      },
       { status: 500 }
     );
   }

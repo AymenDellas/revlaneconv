@@ -79,8 +79,8 @@ export async function callGroq(htmlContent: string): Promise<string> {
             content: htmlContent.slice(0, 12000),
           },
         ],
-        temperature: 0.3,
-        max_tokens: 2000,
+        temperature: 0.2,
+        max_tokens: 2500,
       }),
       signal: AbortSignal.timeout(25000),
     });
