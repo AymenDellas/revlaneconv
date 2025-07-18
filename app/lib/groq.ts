@@ -33,7 +33,7 @@ If it performs? Cool, we talk long-term. If not? You got a solid page for free.
 
 Fair?
 
-[Calendly link] — grab a quick slot if you're down.
+https://calendly.com/dellasaymen/discovery-call-revlane -> grab a quick slot if you're down.
 
 – Aymen
 Revlane | LPs for ad traffic only.
