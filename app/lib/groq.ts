@@ -17,28 +17,26 @@ Use just 2-4 short bullet points — no deep scoring or visual critique.
 
 2. THEN FILL THIS COLD EMAIL TEMPLATE EXACTLY:
 
-Subject: Your paid traffic needs its own battlefield
+Subject: Built your landing page for free (because your ads deserve better)
 
-Hey [First Name],
+Body:
 
-Saw that [Company Name] is scaling , if you're running paid traffic, your homepage shouldn't be carrying that weight.
+Hey [First Name] —
 
-I build dedicated landing pages for SaaS startups like yours, built to convert cold traffic into booked demos. Clear messaging, sharp UX, and none of the BS that kills conversions.
+Saw you're running ads for [Startup Name], and honestly — you're probably sending traffic to a homepage or a weak LP.
 
-Your current site? That’s for branding.
-This is for ROI.
+Let me build you a conversion-optimized landing page tailored specifically for your ad campaign — 100% **free**.
 
-I'm Revlane's founder. We focus purely on LPs designed to cut CAC and boost ROAS. Pages built for campaigns, not browsers.
+No pitch. No BS. You run the ads and I’ll make sure they convert.
 
-Want me to show you how your ad funnel would look with a conversion-engineered LP?
+If it performs? Cool, we talk long-term. If not? You got a solid page for free.
 
-Book a quick call → https://calendly.com/dellasaymen/discovery-call-revlane
+Fair?
 
-No pressure.
+[Calendly link] — grab a quick slot if you're down.
 
-— Aymen
-Founder, Revlane
-https://revlane.tech
+– Aymen
+Revlane | LPs for ad traffic only.
 
 EXECUTION RULES:
 
@@ -48,7 +46,7 @@ EXECUTION RULES:
 • Keep the CTA focused on getting a call/booked slot  
 • NEVER change the email wording — just fill in the brackets smartly
 
-NO markdown. NO placeholders except [First Name], [Startup], [link].
+NO markdown. NO placeholders except [First Name], [Startup Name], [link].
 `;
 
 export async function callGroq(htmlContent: string): Promise<string> {
