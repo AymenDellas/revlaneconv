@@ -23,7 +23,7 @@ Body:
 
 Hey [First Name] —
 
-Saw you're running ads for [Startup Name], and honestly — you're probably sending traffic to a homepage or a weak LP.
+Checked out [Startup Name] and honestly if you’re sending any traffic to a homepage or a weak LP you’re bleeding money.
 
 Let me build you a conversion-optimized landing page tailored specifically for your ad campaign — 100% **free**.
 
