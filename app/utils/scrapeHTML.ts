@@ -64,7 +64,7 @@ export async function scrapeHTML(url: string): Promise<string> {
     }
 
     return htmlContent;
-  } catch (error: any) {
+  } catch (error: unknown) {
     if (axios.isAxiosError(error)) {
       console.error(
         `[Scraper] Axios error scraping ${validUrl}: ${error.message}`
@@ -89,13 +89,21 @@ export async function scrapeHTML(url: string): Promise<string> {
       }
 
       throw new Error(errorMsg);
-    } else {
+    } else if (error instanceof Error) {
       console.error(
         `[Scraper] Generic error scraping ${validUrl} with axios:`,
         error.message
       );
       throw new Error(
         `Failed to scrape HTML content from ${validUrl} using axios. Details: ${error.message}`
+      );
+    } else {
+      console.error(
+        `[Scraper] Unknown error scraping ${validUrl} with axios:`,
+        error
+      );
+      throw new Error(
+        `An unknown error occurred while scraping HTML from ${validUrl}`
       );
     }
   }

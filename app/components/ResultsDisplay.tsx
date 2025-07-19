@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Clipboard, FileText, AlertCircle, Users, Zap, BarChart4, Palette, Layout, Eye, CheckCircle, ArrowUpCircle, Check } from "lucide-react";
+import { Clipboard, FileText, AlertCircle, Zap, BarChart4, Palette, Check } from "lucide-react";
 
 export const ResultsDisplay = ({ text }: { text: string }) => {
   // State for copy button

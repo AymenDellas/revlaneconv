@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { analyzeWebsite } from "@/app/lib/analyzeWebsite";
+import { auditWebsite } from "@/app/lib/auditWebsite";
 import { getWebsiteHtml } from "@/app/lib/getWebsiteHtml";
 
 export async function POST(req: NextRequest) {
@@ -31,10 +31,10 @@ export async function POST(req: NextRequest) {
     console.log(`[API] Fetching HTML for: ${url}`);
     const html = await getWebsiteHtml(url);
 
-    console.log(`[API] Analyzing HTML for: ${url}`);
-    const analysis = await analyzeWebsite(html);
+    console.log(`[API] Auditing HTML for: ${url}`);
+    const analysis = await auditWebsite(html);
 
-    console.log(`[API] Analysis successful for: ${url}`);
+    console.log(`[API] Audit successful for: ${url}`);
     return NextResponse.json({ analysis }, { status: 200 });
   } catch (err: unknown) {
     console.error("[API] Error:", err);
@@ -55,16 +55,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // We've removed timeout handling since we're allowing unlimited time for processing
-    // But keep this commented code as reference in case we need to reimplement it later
-    /*
-    if (message.includes("timed out") || message.includes("taking too long") || message.includes("Timeout")) {
-      return NextResponse.json(
-        { error: "The analysis took too long to complete. This could be due to a slow website, heavy content, or network issues. Please try a different URL or try again later." },
-        { status: 504 }
-      );
-    }
-    */
     if (message.includes("Status: 403")) {
       return NextResponse.json(
         {

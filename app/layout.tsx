@@ -23,7 +23,6 @@ export const metadata = {
   ],
   authors: [{ name: "Aymen", url: "https://aymendellas.live" }],
   creator: "Aymen",
-  themeColor: "#111827",
   openGraph: {
     title: "AI UI/UX Roaster",
     description:
@@ -42,6 +41,13 @@ export const metadata = {
   },
 };
 
+import { Viewport } from "next";
+import Header from "./components/Header";
+
+export const viewport: Viewport = {
+  themeColor: "#111827",
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -52,6 +58,7 @@ export default function RootLayout({
       <body
         className={`${poppins.variable} antialiased selection:bg-amber-700 selection:text-white`}
       >
+        <Header />
         {children}
         <Analytics />
       </body>

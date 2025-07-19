@@ -6,7 +6,7 @@ import { LoadingMessage } from "./LoadingMessage";
 import { ResultsDisplay } from "./ResultsDisplay";
 import { validateAndNormalizeUrl } from "@/app/lib/urlUtils";
 
-const CritiqueForm = () => {
+const AuditForm = () => {
   const [url, setUrl] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -27,7 +27,7 @@ const CritiqueForm = () => {
 
     try {
       // --- NEW: Call the API Route ---
-      const response = await fetch("/api/analyze", {
+      const response = await fetch("/api/audit", {
         // <-- ADJUST PATH if needed
         method: "POST",
         headers: {
@@ -91,7 +91,7 @@ const CritiqueForm = () => {
             {isLoading ? (
               <Loader className="animate-spin h-5 w-5" />
             ) : (
-              "Analyze Website"
+              "Audit Website"
             )}
             {!isLoading && <ArrowRight className="h-5 w-5" />}
           </button>
@@ -106,4 +106,4 @@ const CritiqueForm = () => {
   );
 };
 
-export default CritiqueForm;
+export default AuditForm;

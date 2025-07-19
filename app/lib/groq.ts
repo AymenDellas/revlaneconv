@@ -49,6 +49,60 @@ EXECUTION RULES:
 NO markdown. NO placeholders except [First Name], [Startup Name], [link].
 `;
 
+const SYSTEM_PROMPT_AUDIT = `You are a world-class Conversion Rate Optimization (CRO) specialist. Your task is to analyze the provided landing page HTML and provide a detailed audit.
+
+**Analysis Criteria:**
+
+1.  **Headline & Value Proposition (Above the Fold):**
+    *   Is the main headline compelling and clear?
+    *   Is the value proposition immediately obvious?
+    *   Is it clear what the product/service is and who it's for?
+
+2.  **Call to Action (CTA):**
+    *   Is the primary CTA clear, concise, and compelling?
+    *   Is it prominently displayed above the fold?
+    *   Are there multiple CTAs? If so, are they well-prioritized?
+
+3.  **Copy & Messaging:**
+    *   Is the copy easy to read and understand?
+    *   Does it speak to the target audience's pain points?
+    *   Is it persuasive and benefit-oriented?
+
+4.  **Social Proof & Trust Signals:**
+    *   Are there testimonials, case studies, or logos of well-known clients?
+    *   Are trust signals like security badges or guarantees present?
+    *   Is the social proof specific and believable?
+
+5.  **Urgency & Scarcity:**
+    *   Are there any elements that create a sense of urgency or scarcity (e.g., limited-time offers, low stock warnings)?
+
+**Output Format:**
+
+**Conversion Readiness Score:** [Score]/10
+
+**Summary:**
+[A brief, high-level summary of the landing page's CRO strengths and weaknesses.]
+
+**Conversion Flaws & Improvement Suggestions:**
+*   **[Flaw 1]:** [Description of the flaw]
+    *   **Suggestion:** [Actionable suggestion for improvement]
+*   **[Flaw 2]:** [Description of the flaw]
+    *   **Suggestion:** [Actionable suggestion for improvement]
+*   ...and so on for all identified flaws.
+
+**Scoring Heuristics (out of 10):**
+*   **10:** Perfect. A world-class landing page with no obvious flaws.
+*   **8-9:** Excellent. Minor tweaks could improve performance.
+*   **6-7:** Good. Solid foundation but has clear areas for improvement.
+*   **4-5:** Average. Significant flaws are likely hurting conversion rates.
+*   **1-3:** Poor. Major overhaul needed.
+
+**Instructions:**
+*   Be specific and provide actionable advice.
+*   Use a direct and analytical tone.
+*   Format your output exactly as specified above.
+`;
+
 export async function callGroq(htmlContent: string): Promise<string> {
   // Add this debug line
   console.log("API Key length:", process.env.GROQ_API_KEY?.length);
@@ -109,7 +163,7 @@ export async function callGroq(htmlContent: string): Promise<string> {
         const errorData = JSON.parse(errorText); // Try parsing the logged text
         errorDataMessage =
           errorData.error?.message || errorText.substring(0, 200); // Use parsed message or snippet
-      } catch (e) {
+      } catch {
         // If parsing fails, use a snippet of the raw error text
         errorDataMessage =
           errorText.substring(0, 200) + (errorText.length > 200 ? "..." : "");
@@ -147,33 +201,101 @@ export async function callGroq(htmlContent: string): Promise<string> {
   }
 }
 
-// Generic fallback response
-function fallbackAnalysis(message?: string) {
-  return `BUSINESS ANALYSIS:
----
-General Purpose: Currently analyzing website data
-Target Audience: Audience analysis in progress
-Core Offering: Service analysis underway
-Unique Value Proposition: Differentiators being identified
 
-Key Metrics:
-• Website performance
-• Conversion rates
-• User engagement
+export async function callGroqAudit(htmlContent: string): Promise<string> {
+  // Add this debug line
+  console.log("API Key length:", process.env.GROQ_API_KEY?.length);
 
-Competitors:
-• Industry analysis pending
+  if (!process.env.GROQ_API_KEY) {
+    console.error("Missing Groq API Key");
+    throw new Error("API configuration error - contact support");
+  }
 
-COLD EMAIL TEMPLATE:
----
-Subject: Website optimization opportunity
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${process.env.GROQ_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "llama3-70b-8192",
+        messages: [
+          {
+            role: "system",
+            content: SYSTEM_PROMPT_AUDIT,
+          },
+          {
+            role: "user",
+            content: htmlContent.slice(0, 12000),
+          },
+        ],
+        temperature: 0.2,
+        max_tokens: 2500,
+      }),
+      signal: AbortSignal.timeout(25000),
+    });
 
-Hi [Name],
+    if (!res.ok) {
+      const errorText = await res.text(); // Get response as text to see what it is
+      console.error(`[Groq API Error] Status: ${res.status} ${res.statusText}`);
+      console.error(
+        `[Groq API Error] Response Body (first 500 chars): ${errorText.substring(
+          0,
+          500
+        )}...`
+      );
 
-We specialize in helping businesses improve their online presence. Let's discuss how we can enhance your website's performance.
+      if (res.status === 401) {
+        console.error(
+          "Invalid API key - please check your .env file or environment variables."
+        );
+        // Provide a more specific error message for 401
+        throw new Error(
+          "Analysis failed (401): Unauthorized. Please check your Groq API key."
+        );
+      }
 
-Available for a quick call this week?
+      // Try to parse as JSON for structured error, but fallback if it's not JSON
+      let errorDataMessage = "Unknown error";
+      try {
+        const errorData = JSON.parse(errorText); // Try parsing the logged text
+        errorDataMessage =
+          errorData.error?.message || errorText.substring(0, 200); // Use parsed message or snippet
+      } catch {
+        // If parsing fails, use a snippet of the raw error text
+        errorDataMessage =
+          errorText.substring(0, 200) + (errorText.length > 200 ? "..." : "");
+      }
+      throw new Error(`Analysis failed (${res.status}): ${errorDataMessage}`);
+    }
 
-Best regards,
-[Your Name]`;
+    // If res.ok, but content type is not JSON, it's also an issue
+    const contentType = res.headers.get("content-type");
+    if (!contentType || !contentType.includes("application/json")) {
+      const responseText = await res.text();
+      console.error(
+        `[Groq API Error] Expected JSON response, but got Content-Type: ${contentType}`
+      );
+      console.error(
+        `[Groq API Error] Response Body (first 500 chars): ${responseText.substring(
+          0,
+          500
+        )}...`
+      );
+      throw new Error(
+        `Analysis failed: Expected JSON response from Groq API, but received ${contentType}. Response snippet: ${responseText.substring(
+          0,
+          200
+        )}` + (responseText.length > 200 ? "..." : "")
+      );
+    }
+
+    const data = await res.json();
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error("Analysis Error:", error);
+    // Rethrow the error instead of using fallback
+    throw error;
+  }
 }
