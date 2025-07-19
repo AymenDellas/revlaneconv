@@ -18,28 +18,30 @@ export async function scrapeHTML(url: string): Promise<string> {
     const page = await context.newPage();
 
     await page.goto(validUrl, { waitUntil: "networkidle" });
+    await page.waitForTimeout(3000); // Wait for 3 seconds after network idle
 
-    // Optional: Strip out nav/footer/noise
-    await page.evaluate(() => {
-      const selectorsToRemove = "nav, footer, header, script, style, noscript";
+    const extractedText = await page.evaluate(() => {
+      const selectorsToRemove = "nav, footer, header, script, style, noscript, [aria-modal], [role='dialog']";
       document.querySelectorAll(selectorsToRemove).forEach((el) => el.remove());
+
+      const contentSelectors = "h1, h2, h3, h4, h5, h6, p, button, a[href*='signup'], [role='button'], [class*='hero'], [class*='features'], [class*='testimonials']";
+      const elements = Array.from(document.querySelectorAll(contentSelectors));
+
+      let visibleText = "";
+      elements.forEach(el => {
+        if (el instanceof HTMLElement && el.offsetParent !== null) {
+          visibleText += el.innerText + "\n";
+        }
+      });
+
+      return visibleText;
     });
 
-    const htmlContent = await page.content();
-
-    if (
-      !htmlContent ||
-      typeof htmlContent !== "string" ||
-      htmlContent.trim().length < 100
-    ) {
-      const contentLength = htmlContent ? String(htmlContent).length : 0;
-      const snippet = htmlContent ? String(htmlContent).substring(0, 200) : "";
-      console.warn(
-        `[Scraper] Potentially insufficient content from ${validUrl} using Playwright. Length: ${contentLength}. Snippet: \"${snippet}\"`
-      );
+    if (!extractedText || extractedText.trim().length < 100) {
+      throw new Error("Couldn’t find readable content. Page might be JavaScript-protected or empty.");
     }
 
-    return htmlContent;
+    return extractedText;
   } catch (error: unknown) {
     let message = `Failed to scrape HTML content from ${validUrl} using Playwright.`;
     if (error instanceof Error) {
