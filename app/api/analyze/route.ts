@@ -42,12 +42,10 @@ export async function POST(req: NextRequest) {
     // More specific error responses based on error message
     if (
       err.message.includes("API key") ||
-      err.message.includes("configuration")
+      err.message.includes("configuration") ||
+      err.message.includes("Groq API")
     ) {
-      return NextResponse.json(
-        { error: "Service configuration error. Please try again later." },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: err.message }, { status: 500 });
     }
 
     // We've removed timeout handling since we're allowing unlimited time for processing

@@ -38,12 +38,10 @@ export async function POST(req: NextRequest) {
 
     if (
       err.message.includes("API key") ||
-      err.message.includes("configuration")
+      err.message.includes("configuration") ||
+      err.message.includes("Groq API")
     ) {
-      return NextResponse.json(
-        { error: "Service configuration error. Please try again later." },
-        { status: 500 }
-      );
+      return NextResponse.json({ error: err.message }, { status: 500 });
     }
     if (err.message.includes("Status: 403")) {
       return NextResponse.json(
