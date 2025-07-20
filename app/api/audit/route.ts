@@ -74,11 +74,24 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    if (err.message.includes("Could not extract visible landing page content.")) {
+      return NextResponse.json(
+        {
+          error: "Could not extract visible landing page content.",
+          details:
+            "The scraper could not find enough meaningful content on the page. This might happen with single-page applications or very dynamic websites.",
+          originalError: err.message,
+        },
+        { status: 422 }
+      );
+    }
+
     if (
       err.message.includes("HTML") ||
       err.message.includes("content") ||
       err.message.includes("empty") ||
-      err.message.includes("protected")
+      err.message.includes("protected") ||
+      err.message.includes("Puppeteer")
     ) {
       return NextResponse.json(
         {
