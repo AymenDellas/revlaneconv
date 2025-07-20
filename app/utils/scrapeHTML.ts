@@ -13,7 +13,11 @@ export async function scrapeHTML(url: string): Promise<string> {
 
   let browser;
   try {
-    browser = await puppeteer.launch({ headless: true });
+    browser = await puppeteer.launch({
+      headless: true,
+      executablePath:
+        "/home/sbx_user1051/.cache/puppeteer/chrome/linux-138.0.7204.157/chrome-linux64/chrome",
+    });
     const page = await browser.newPage();
     await page.goto(validUrl, { waitUntil: "networkidle0" });
 
