@@ -49,7 +49,10 @@ EXECUTION RULES:
 NO markdown. NO placeholders except [First Name], [Startup Name], [link].
 `;
 
-export async function callGroq(htmlContent: string): Promise<string> {
+export async function callGroq(
+  htmlContent: string,
+  systemPrompt: string = SYSTEM_PROMPT
+): Promise<string> {
   // Add this debug line
   console.log("API Key length:", process.env.GROQ_API_KEY?.length);
 
@@ -70,7 +73,7 @@ export async function callGroq(htmlContent: string): Promise<string> {
         messages: [
           {
             role: "system",
-            content: SYSTEM_PROMPT,
+            content: systemPrompt,
           },
           {
             role: "user",
