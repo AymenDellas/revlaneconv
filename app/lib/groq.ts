@@ -102,7 +102,7 @@ export async function callGroq(
         );
         // Provide a more specific error message for 401
         throw new Error(
-          "Analysis failed (401): Unauthorized. Please check your Groq API key."
+          "Invalid Groq API key. Please check your configuration and try again."
         );
       }
 
@@ -117,7 +117,7 @@ export async function callGroq(
         errorDataMessage =
           errorText.substring(0, 200) + (errorText.length > 200 ? "..." : "");
       }
-      throw new Error(`Analysis failed (${res.status}): ${errorDataMessage}`);
+      throw new Error(`Groq API request failed with status ${res.status} ${res.statusText}: ${errorDataMessage}`);
     }
 
     // If res.ok, but content type is not JSON, it's also an issue
