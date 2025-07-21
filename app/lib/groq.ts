@@ -55,6 +55,7 @@ export async function callGroq(
 ): Promise<string> {
   // Add this debug line
   console.log("Using API Key:", process.env.GROQ_API_KEY);
+  console.log("API Key from env", process.env.GROQ_API_KEY);
 
   if (!process.env.GROQ_API_KEY) {
     console.error("Missing Groq API Key");

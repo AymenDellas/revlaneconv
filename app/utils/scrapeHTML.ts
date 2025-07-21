@@ -1,4 +1,4 @@
-import puppeteer from "puppeteer";
+import { chromium } from "playwright";
 import { validateAndNormalizeUrl } from "@/app/lib/urlUtils";
 
 export async function scrapeHTML(url: string): Promise<string> {
@@ -8,21 +8,19 @@ export async function scrapeHTML(url: string): Promise<string> {
   }
 
   console.log(
-    `[Scraper] Starting to fetch content from: ${validUrl} using Puppeteer`
+    `[Scraper] Starting to fetch content from: ${validUrl} using Playwright`
   );
 
   let browser;
   try {
-    browser = await puppeteer.launch({
-      headless: true,
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
+    browser = await chromium.launch({ headless: true });
+    const context = await browser.newContext({
+      userAgent:
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
     });
-    const page = await browser.newPage();
-    await page.setUserAgent(
-      "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36"
-    );
-    await page.setViewport({ width: 1920, height: 1080 });
-    await page.goto(validUrl, { waitUntil: "networkidle0" });
+    const page = await context.newPage();
+    await page.setViewportSize({ width: 1920, height: 1080 });
+    await page.goto(validUrl, { waitUntil: "networkidle" });
 
     const extractedContent = await page.evaluate(() => {
       const selectors = [
@@ -62,10 +60,10 @@ export async function scrapeHTML(url: string): Promise<string> {
     return extractedContent;
   } catch (error: any) {
     console.error(
-      `[Scraper] Puppeteer error scraping ${validUrl}: ${error.message}`
+      `[Scraper] Playwright error scraping ${validUrl}: ${error.message}`
     );
     throw new Error(
-      `Failed to scrape HTML content from ${validUrl} using Puppeteer. Details: ${error.message}`
+      `Failed to scrape HTML content from ${validUrl} using Playwright. Details: ${error.message}`
     );
   } finally {
     if (browser) {
