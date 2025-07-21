@@ -1,4 +1,5 @@
-import { chromium } from "playwright";
+import axios from "axios";
+import * as cheerio from "cheerio";
 import { validateAndNormalizeUrl } from "@/app/lib/urlUtils";
 
 export async function scrapeHTML(url: string): Promise<string> {
@@ -8,76 +9,75 @@ export async function scrapeHTML(url: string): Promise<string> {
   }
 
   console.log(
-    `[Scraper] Starting to fetch content from: ${validUrl} using Playwright`
+    `[Scraper] Starting to fetch content from: ${validUrl} using axios and cheerio`
   );
 
-  let browser;
   try {
-    browser = await chromium.launch({ headless: true });
-    const context = await browser.newContext({
-      userAgent:
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+    const response = await axios.get(validUrl, {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8",
+        "Accept-Language": "en-US,en;q=0.9",
+        "Accept-Encoding": "gzip, deflate, br",
+        Connection: "keep-alive",
+        "Upgrade-Insecure-Requests": "1",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+        "Sec-Fetch-User": "?1",
+      },
     });
-    const page = await context.newPage();
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.goto(validUrl, { waitUntil: "networkidle" });
+    const html = response.data;
+    const $ = cheerio.load(html);
 
-    const extractedContent = await page.evaluate(() => {
-      const selectors = [
-        "h1",
-        "h2",
-        "h3",
-        "p",
-        "span",
-        "button",
-        'a[href*="signup"]',
-        'a[href*="get"]',
-        '[role="button"]',
-        ".hero",
-        ".features",
-        ".cta",
-        ".testimonials",
-        '[class*="headline"]',
-        '[class*="subheadline"]',
-        '[class*="cta-button"]',
-        '[class*="testimonial"]',
-        '[id*="hero"]',
-        '[id*="features"]',
-        '[id*="cta"]',
-        '[id*="testimonials"]',
-      ];
+    // Remove unwanted elements
+    $("nav, footer, script, style, [aria-hidden='true']").remove();
 
-      // Exclude navbars, footers, cookie banners
-      const excludeSelectors = "nav, footer, #cookie-banner, .cookie-consent, [class*='cookie'], [id*='cookie']";
-      document.querySelectorAll(excludeSelectors).forEach((el) => el.remove());
-
-      let content = "";
-      document.querySelectorAll(selectors.join(", ")).forEach((el) => {
-        if (el.textContent && el.textContent.trim() !== "") {
-          content += el.textContent.trim() + "\\n";
-        }
-      });
-
-      console.log("Extracted Content:", content);
-      return content;
+    // Extract text from relevant elements
+    const selectors = [
+      "h1",
+      "h2",
+      "h3",
+      "p",
+      "a",
+      "li",
+      "span",
+      "div[class*='content']",
+      "div[class*='main']",
+      "div[id*='content']",
+      "div[id*='main']",
+    ];
+    let extractedText = "";
+    $(selectors.join(",")).each((i, elem) => {
+      const text = $(elem).text().trim();
+      if (text) {
+        extractedText += text + "\\n";
+      }
     });
 
-    if (!extractedContent || extractedContent.trim().length < 100) {
+    if (extractedText.trim().length < 100) {
       console.log("Extracted content was less than 100 characters long.");
-      throw new Error("Could not extract visible landing page content.");
+      throw new Error("Could not extract sufficient content from the website.");
     }
 
-    return extractedContent;
+    return extractedText;
   } catch (error: any) {
-    console.error(
-      `[Scraper] Playwright error scraping ${validUrl}: ${error.message}`
-    );
-    throw new Error(
-      `Failed to scrape HTML content from ${validUrl} using Playwright. Details: ${error.message}`
-    );
-  } finally {
-    if (browser) {
-      await browser.close();
+    if (axios.isAxiosError(error)) {
+      console.error(
+        `[Scraper] Axios error scraping ${validUrl}: ${error.message}`
+      );
+      throw new Error(
+        `Failed to scrape HTML content from ${validUrl} using axios. Details: ${error.message}`
+      );
+    } else {
+      console.error(
+        `[Scraper] Generic error scraping ${validUrl}: ${error.message}`
+      );
+      throw new Error(
+        `Failed to scrape HTML content from ${validUrl}. Details: ${error.message}`
+      );
     }
   }
 }

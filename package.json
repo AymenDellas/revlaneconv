@@ -17,7 +17,7 @@
     "@vercel/analytics": "^1.5.0",
     "axios": "^1.9.0",
     "axios-retry": "^4.5.0",
-    "cheerio": "^1.0.0",
+    "cheerio": "^1.1.2",
     "express-rate-limit": "^7.5.0",
     "html2canvas": "^1.4.1",
     "https-proxy-agent": "^7.0.6",
