@@ -13,45 +13,78 @@ export async function scrapeHTML(url: string): Promise<string> {
 
   let browser;
   try {
-    browser = await chromium.launch({ headless: true });
-    const context = await browser.newContext({
-      userAgent:
-        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-    });
-    const page = await context.newPage();
-    await page.setViewportSize({ width: 1920, height: 1080 });
-    await page.goto(validUrl, { waitUntil: "networkidle" });
+    try {
+      browser = await chromium.launch({ headless: true });
+    } catch (error: any) {
+      throw new Error(`Failed to launch browser: ${error.message}`);
+    }
 
-    const extractedContent = await page.evaluate(() => {
-      const selectors = [
-        "h1",
-        "h2",
-        "h3",
-        "p",
-        "span",
-        "button",
-        'a[href*="signup"]',
-        'a[href*="get"]',
-        '[role="button"]',
-        ".hero",
-        ".features",
-        ".cta",
-        ".testimonials",
-      ];
-
-      // Exclude navbars, footers, cookie banners
-      const excludeSelectors = "nav, footer, #cookie-banner, .cookie-consent";
-      document.querySelectorAll(excludeSelectors).forEach((el) => el.remove());
-
-      let content = "";
-      document.querySelectorAll(selectors.join(", ")).forEach((el) => {
-        if (el.textContent && el.textContent.trim() !== "") {
-          content += el.textContent.trim() + "\\n";
-        }
+    let context;
+    try {
+      context = await browser.newContext({
+        userAgent:
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
       });
+    } catch (error: any) {
+      throw new Error(`Failed to create browser context: ${error.message}`);
+    }
 
-      return content;
-    });
+    let page;
+    try {
+      page = await context.newPage();
+    } catch (error: any) {
+      throw new Error(`Failed to create new page: ${error.message}`);
+    }
+
+    try {
+      await page.setViewportSize({ width: 1920, height: 1080 });
+    } catch (error: any) {
+      throw new Error(`Failed to set viewport size: ${error.message}`);
+    }
+
+    try {
+      await page.goto(validUrl, { waitUntil: "networkidle" });
+    } catch (error: any) {
+      throw new Error(`Failed to navigate to URL: ${error.message}`);
+    }
+
+    let extractedContent;
+    try {
+      extractedContent = await page.evaluate(() => {
+        const selectors = [
+          "h1",
+          "h2",
+          "h3",
+          "p",
+          "span",
+          "button",
+          'a[href*="signup"]',
+          'a[href*="get"]',
+          '[role="button"]',
+          ".hero",
+          ".features",
+          ".cta",
+          ".testimonials",
+        ];
+
+        // Exclude navbars, footers, cookie banners
+        const excludeSelectors = "nav, footer, #cookie-banner, .cookie-consent";
+        document
+          .querySelectorAll(excludeSelectors)
+          .forEach((el) => el.remove());
+
+        let content = "";
+        document.querySelectorAll(selectors.join(", ")).forEach((el) => {
+          if (el.textContent && el.textContent.trim() !== "") {
+            content += el.textContent.trim() + "\\n";
+          }
+        });
+
+        return content;
+      });
+    } catch (error: any) {
+      throw new Error(`Failed to extract content from page: ${error.message}`);
+    }
 
     if (!extractedContent || extractedContent.trim().length < 100) {
       throw new Error("Could not extract visible landing page content.");
