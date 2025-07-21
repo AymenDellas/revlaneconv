@@ -54,7 +54,7 @@ export async function callGroq(
   systemPrompt: string = SYSTEM_PROMPT
 ): Promise<string> {
   // Add this debug line
-  console.log("API Key length:", process.env.GROQ_API_KEY?.length);
+  console.log("Using API Key:", process.env.GROQ_API_KEY);
 
   if (!process.env.GROQ_API_KEY) {
     console.error("Missing Groq API Key");
