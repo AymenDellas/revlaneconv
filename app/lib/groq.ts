@@ -17,32 +17,20 @@ Use just 2-4 short bullet points — no deep scoring or visual critique.
 
 2. THEN FILL THIS COLD EMAIL TEMPLATE EXACTLY:
 
-Subject: Built your landing page for free (because your ads deserve better)
+Subject: I’ll lower your CAC FOR FREE.
 
-Body:
+Hey [First Name] — Checked out [Company]. If you're driving traffic to a homepage or weak LP, you're bleeding money. Let me build you a high-converting landing page tailored to your ad campaign -> 100% free.
 
-Hey [First Name] —
+No pitch. No BS. You run the ads — I’ll make sure they convert. Better LP = lower CAC, higher ROI. If it performs? We talk long-term. If not? You still walk away with a killer page.
 
-Checked out [Startup Name] and honestly if you’re sending any traffic to a homepage or a weak LP you’re bleeding money.
+Fair? → https://calendly.com/dellasaymen/discovery-call-revlane — grab a quick slot if you're down.
 
-Let me build you a conversion-optimized landing page tailored specifically for your ad campaign — 100% **free**.
-
-No pitch. No BS. You run the ads and I’ll make sure they convert.
-
-If it performs? Cool, we talk long-term. If not? You got a solid page for free.
-
-Fair?
-
-https://calendly.com/dellasaymen/discovery-call-revlane -> grab a quick slot if you're down.
-
-– Aymen
-Revlane | LPs for ad traffic only.
+– Aymen Revlane | Landing Pages that reduce CAC & boost ROAS
 
 EXECUTION RULES:
 
 • Write like a conversion strategist, not a dev or designer  
 • Tone: confident, premium, sharp — not friendly or generic  
-• Never say “free”  
 • Keep the CTA focused on getting a call/booked slot  
 • NEVER change the email wording — just fill in the brackets smartly
 
