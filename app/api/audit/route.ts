@@ -1,10 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { analyzeWebsite } from "@/app/lib/analyzeWebsite";
+import { auditLandingPage } from "@/app/lib/auditLandingPage";
 import { getWebsiteHtml } from "@/app/lib/getWebsiteHtml";
 
 export async function POST(req: NextRequest) {
   try {
-    // Check if the request is valid JSON
     let body;
     try {
       body = await req.json();
@@ -17,7 +16,6 @@ export async function POST(req: NextRequest) {
 
     const { url } = body;
 
-    // Validate URL
     if (!url || typeof url !== "string") {
       return NextResponse.json(
         {
@@ -27,19 +25,17 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // No timeout - allow the operation to run as long as needed
     console.log(`[API] Fetching HTML for: ${url}`);
     const html = await getWebsiteHtml(url);
 
-    console.log(`[API] Analyzing HTML for: ${url}`);
-    const analysis = await analyzeWebsite(html);
+    console.log(`[API] Auditing HTML for: ${url}`);
+    const audit = await auditLandingPage(html);
 
-    console.log(`[API] Analysis successful for: ${url}`);
-    return NextResponse.json({ analysis }, { status: 200 });
+    console.log(`[API] Audit successful for: ${url}`);
+    return NextResponse.json({ audit }, { status: 200 });
   } catch (err: any) {
     console.error("[API] Error:", err);
 
-    // More specific error responses based on error message
     if (
       err.message.includes("API key") ||
       err.message.includes("configuration") ||
@@ -47,17 +43,6 @@ export async function POST(req: NextRequest) {
     ) {
       return NextResponse.json({ error: err.message }, { status: 500 });
     }
-
-    // We've removed timeout handling since we're allowing unlimited time for processing
-    // But keep this commented code as reference in case we need to reimplement it later
-    /*
-    if (err.message.includes("timed out") || err.message.includes("taking too long") || err.message.includes("Timeout")) {
-      return NextResponse.json(
-        { error: "The analysis took too long to complete. This could be due to a slow website, heavy content, or network issues. Please try a different URL or try again later." },
-        { status: 504 }
-      );
-    }
-    */
     if (err.message.includes("Status: 403")) {
       return NextResponse.json(
         {
@@ -117,7 +102,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Generic error handler for all other cases
     return NextResponse.json(
       {
         error:

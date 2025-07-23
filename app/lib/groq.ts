@@ -37,9 +37,13 @@ EXECUTION RULES:
 NO markdown. NO placeholders except [First Name], [Startup Name], [link].
 `;
 
-export async function callGroq(htmlContent: string): Promise<string> {
+export async function callGroq(
+  htmlContent: string,
+  systemPrompt: string = SYSTEM_PROMPT
+): Promise<string> {
   // Add this debug line
-  console.log("API Key length:", process.env.GROQ_API_KEY?.length);
+  console.log("Using API Key:", process.env.GROQ_API_KEY);
+  console.log("API Key from env", process.env.GROQ_API_KEY);
 
   if (!process.env.GROQ_API_KEY) {
     console.error("Missing Groq API Key");
@@ -58,7 +62,7 @@ export async function callGroq(htmlContent: string): Promise<string> {
         messages: [
           {
             role: "system",
-            content: SYSTEM_PROMPT,
+            content: systemPrompt,
           },
           {
             role: "user",
@@ -87,7 +91,7 @@ export async function callGroq(htmlContent: string): Promise<string> {
         );
         // Provide a more specific error message for 401
         throw new Error(
-          "Analysis failed (401): Unauthorized. Please check your Groq API key."
+          "Invalid Groq API key. Please check your configuration and try again."
         );
       }
 
@@ -102,7 +106,7 @@ export async function callGroq(htmlContent: string): Promise<string> {
         errorDataMessage =
           errorText.substring(0, 200) + (errorText.length > 200 ? "..." : "");
       }
-      throw new Error(`Analysis failed (${res.status}): ${errorDataMessage}`);
+      throw new Error(`Groq API request failed with status ${res.status} ${res.statusText}: ${errorDataMessage}`);
     }
 
     // If res.ok, but content type is not JSON, it's also an issue

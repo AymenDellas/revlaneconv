@@ -1,6 +1,8 @@
 import React from "react";
 import { Rocket } from "lucide-react";
 import CritiqueForm from "./components/CritiqueForm";
+import Link from "next/link";
+
 const page = () => {
   return (
     <main className="font-poppins flex min-h-screen flex-col items-center  py-24">
@@ -13,6 +15,9 @@ const page = () => {
           Get your webpage critiqued by AI. Receive honest feedback to improve
           your conversion rates and user experience.
         </p>
+        <Link href="/audit" className="text-blue-600 hover:underline">
+          Go to Landing Page Audit
+        </Link>
       </div>
       <CritiqueForm />
     </main>
