@@ -19,11 +19,11 @@ Use just 2-4 short bullet points — no deep scoring or visual critique.
 
 Subject: I’ll lower your CAC FOR FREE.
 
-Hey [First Name] — Noticed you’re running paid ads to [Company] — but sending that traffic to a homepage or generic LP is burning budget. Let me build you a high-converting landing page tailored to your ad campaign -> 100% free.
+Hey [First Name], Noticed you’re running paid ads to [Company] — but sending that traffic to a homepage or generic LP is burning budget. Let me build you a high-converting landing page tailored to your ad campaign -> 100% free.
 
-No pitch. No BS. You run the ads — I’ll make sure they convert. Better LP = lower CAC, higher ROI. If it performs? We talk long-term. If not? You still walk away with a killer page.
+No pitch. No BS. You run the ads and I’ll make sure they convert. Better LP = lower CAC, higher ROI. If it performs? We talk long-term. If not? You still walk away with a killer page.
 
-Fair? → https://calendly.com/dellasaymen/discovery-call-revlane — grab a quick slot if you're down.
+Fair? → https://calendly.com/dellasaymen/discovery-call-revlane - grab a quick slot if you're down.
 
 – Aymen Revlane | Landing Pages that reduce CAC & boost ROAS
 
