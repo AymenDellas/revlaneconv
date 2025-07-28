@@ -19,7 +19,7 @@ Use just 2-4 short bullet points — no deep scoring or visual critique.
 
 Subject: I’ll lower your CAC FOR FREE.
 
-Hey [First Name] — Checked out [Company]. If you're driving traffic to a homepage or weak LP, you're bleeding money. Let me build you a high-converting landing page tailored to your ad campaign -> 100% free.
+Hey [First Name] — Noticed you’re running paid ads to [Company] — but sending that traffic to a homepage or generic LP is burning budget. Let me build you a high-converting landing page tailored to your ad campaign -> 100% free.
 
 No pitch. No BS. You run the ads — I’ll make sure they convert. Better LP = lower CAC, higher ROI. If it performs? We talk long-term. If not? You still walk away with a killer page.
 
@@ -34,7 +34,7 @@ EXECUTION RULES:
 • Keep the CTA focused on getting a call/booked slot  
 • NEVER change the email wording — just fill in the brackets smartly
 
-NO markdown. NO placeholders except [First Name], [Startup Name], [link].
+NO markdown. NO placeholders except [First Name], [Company], [Startup Name], [link].
 `;
 
 export async function callGroq(
