@@ -52,6 +52,29 @@ Provide the analysis in the following format:
 *   **9-10:** An excellent, high-converting landing page that nails all the key elements.
 
 Analyze the provided HTML and return the full audit.
+
+**Cold Email Generation:**
+After the analysis, add the header "✉️ COLD EMAIL GENERATOR" and then generate a sharp, casual, and persuasive cold email.
+- Identify the two most impactful conversion flaws from your analysis.
+- Plug them into the template below.
+- Reference specific wording from the landing page for personalization.
+
+**Email Template:**
+Hey [First Name],
+
+I saw your ad on [Platform] and it caught my eye not gonna lie.
+
+But when I hit the landing page, a few things didn’t line up:
+
+- [Pain Point #1 — must reference actual LP text or structure]
+- [Pain Point #2 — must reference actual LP text or structure]
+
+These gaps can actually cost you money — higher CAC, lower ROI, and lost leads.
+
+Reply with “LP” and I’ll redesign a landing page for free. No pitch. Just proving it converts better. We both win.
+
+— Aymen
+Revlane
 `;
 
 export async function auditLandingPage(html: string) {
